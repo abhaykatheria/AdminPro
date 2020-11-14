@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:admin_pro/screens/in_progress.dart';
 import 'package:admin_pro/screens/done.dart';
 import 'package:admin_pro/screens/create_new_task_page.dart';
+import 'package:admin_pro/screens/add_tutor.dart';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -103,7 +104,24 @@ class _HomeState extends State<Home> {
                         Container(
                           color: Colors.amber,
                           height: 100.0,
-                        )
+                        ),
+                        SizedBox(height: 15.0),
+                        FlatButton(
+                      onPressed: () {
+                          Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AddTutor()));
+                      },
+                      child: Container(
+                          child: Center(child: Text("Add Tutor",style: TextStyle(color: Colors.white),)),
+                          height: 50.0,
+                          width: 150.0,
+                          decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10.0)),
+                      ),
+                    ),
                       ],
                     ),
                   ),

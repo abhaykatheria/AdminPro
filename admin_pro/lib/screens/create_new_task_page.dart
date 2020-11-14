@@ -184,22 +184,41 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                             ],
                           ),
                         ),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              RaisedButton(
-                                  child: Text('Submit'),
-                                  onPressed: () {
-                                    if (_fbKey.currentState.saveAndValidate()) {
-                                      print(_fbKey.currentState.value);
-                                    }
-                                  }),
-                              RaisedButton(
-                                  child: Text("Clear"),
-                                  onPressed: () {
-                                    _fbKey.currentState.reset();
-                                  })
-                            ])
+                        Padding(
+                          padding: const EdgeInsets.only(top:10.0),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                FlatButton(
+                      onPressed: () {
+                          if (_fbKey.currentState.saveAndValidate()) {
+                                        print(_fbKey.currentState.value);
+                                      }
+                      },
+                      child: Container(
+                          child: Center(child: Text("Add Assignment",style: TextStyle(color: Colors.white),)),
+                          height: 50.0,
+                          width: 150.0,
+                          decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(10.0)),
+                      ),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                          _fbKey.currentState.reset();
+                      },
+                      child: Container(
+                          child: Center(child: Text("Clear fields",style: TextStyle(color: Colors.white),)),
+                          height: 50.0,
+                          width: 150.0,
+                          decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10.0)),
+                      ),
+                    ),
+                              ]),
+                        )
                       ],
                     ),
                   )),
@@ -210,3 +229,15 @@ class _CreateNewTaskState extends State<CreateNewTask> {
     );
   }
 }
+// RaisedButton(
+//                                   child: Text('Submit'),
+//                                   onPressed: () {
+//                                     if (_fbKey.currentState.saveAndValidate()) {
+//                                       print(_fbKey.currentState.value);
+//                                     }
+//                                   }),
+//                               RaisedButton(
+//                                   child: Text("Clear"),
+//                                   onPressed: () {
+//                                     _fbKey.currentState.reset();
+//                                   })

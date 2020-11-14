@@ -28,30 +28,30 @@ class _InProgressState extends State<InProgress> {
 
 
 
-  bool _initialized = false;
-  bool _error = false;
+  // bool _initialized = false;
+  // bool _error = false;
 
-  // Define an async function to initialize FlutterFire
-  void initializeFlutterFire() async {
-    try {
-      // Wait for Firebase to initialize and set `_initialized` state to true
-      await Firebase.initializeApp();
-      setState(() {
-        _initialized = true;
-      });
-    } catch(e) {
-      // Set `_error` state to true if Firebase initialization fails
-      setState(() {
-        _error = true;
-      });
-    }
-  }
+  // // Define an async function to initialize FlutterFire
+  // void initializeFlutterFire() async {
+  //   try {
+  //     // Wait for Firebase to initialize and set `_initialized` state to true
+  //     await Firebase.initializeApp();
+  //     setState(() {
+  //       _initialized = true;
+  //     });
+  //   } catch(e) {
+  //     // Set `_error` state to true if Firebase initialization fails
+  //     setState(() {
+  //       _error = true;
+  //     });
+  //   }
+  // }
 
-  @override
-  void initState() {
-    initializeFlutterFire();
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   initializeFlutterFire();
+  //   super.initState();
+  // }
 
 
   Text subheading(String title) {
@@ -68,7 +68,7 @@ class _InProgressState extends State<InProgress> {
   Widget _buildListItem(BuildContext context, DocumentSnapshot doc ){
     return TaskContainer(
                               title: doc['student'],
-                              subtitle: "Due " + doc['duedate'].toDate().toString(),
+                              subtitle: "Due " + doc['duedate'].toDate().,
                               boxColor: LightColors.kLightYellow2,
                               price: doc['price'],
                               tutor: "katheria" ,
@@ -78,8 +78,6 @@ class _InProgressState extends State<InProgress> {
 
   @override
   Widget build(BuildContext context) {
-    if(!_initialized)
-      return Text("not inti");
     return Scaffold(
       body: SafeArea(
         child: Container(

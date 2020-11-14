@@ -68,7 +68,7 @@ class _InProgressState extends State<InProgress> {
   Widget _buildListItem(BuildContext context, DocumentSnapshot doc ){
     return TaskContainer(
                               title: doc['student'],
-                              subtitle: "Due " + doc['duedate'].toDate().,
+                              subtitle: "Due " + doc['duedate'].toDate().toString(),
                               boxColor: LightColors.kLightYellow2,
                               price: doc['price'],
                               tutor: "katheria" ,

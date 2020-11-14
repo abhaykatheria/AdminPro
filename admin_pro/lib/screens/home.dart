@@ -33,6 +33,7 @@ class _HomeState extends State<Home> {
           Expanded(
             child: SingleChildScrollView(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Container(
                     color: Colors.transparent,

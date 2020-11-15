@@ -68,7 +68,7 @@ class _InProgressState extends State<InProgress> {
   Widget _buildListItem(BuildContext context, DocumentSnapshot doc ){
     return TaskContainer(
                               title: doc['student'],
-                              subtitle: "Due " + doc['duedate'].toDate().toString(),
+                              subtitle: "Due " + doc['due_date'].toDate().toString(),
                               boxColor: LightColors.kLightYellow2,
                               price: doc['price'],
                               tutor: "katheria" ,
@@ -107,7 +107,7 @@ class _InProgressState extends State<InProgress> {
                   Container(
                     height: 125.0*assignments.length,
                     child: StreamBuilder(
-                      stream: FirebaseFirestore.instance.collection("Assignments").snapshots(),
+                      stream: FirebaseFirestore.instance.collection("assignments").snapshots(),
                       builder: (context, snapshot) {
                         if( !snapshot.hasData) return Text("Loading.......");
                         return 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:admin_pro/widgets/data.dart';
 import 'package:admin_pro/screens/taskview.dart';
 
 class TaskContainer extends StatelessWidget {
@@ -7,10 +6,10 @@ class TaskContainer extends StatelessWidget {
   final String subtitle,tutor;
   final Color boxColor;
   final int price;
-  final Assignment a;
+  final String id;
   
   TaskContainer({
-    this.title, this.subtitle, this.boxColor, this.price, this.tutor, this.a
+    this.title, this.subtitle, this.boxColor, this.price, this.tutor, this.id
   });
 
   @override
@@ -20,7 +19,7 @@ class TaskContainer extends StatelessWidget {
             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => TaskView(a:a)));
+                                    builder: (context) => TaskView(id:id)));
           },
           child: Container(
         margin: EdgeInsets.symmetric(vertical: 5.0),
@@ -45,7 +44,7 @@ class TaskContainer extends StatelessWidget {
                   child: Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 14.0,
+                      fontSize: 10.0,
                       color: Colors.black54,
                       fontWeight: FontWeight.w400,
                     ),

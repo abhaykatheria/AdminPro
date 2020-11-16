@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
@@ -6,7 +8,7 @@ import 'package:admin_pro/theme/decorations.dart';
 import 'package:form_builder_file_picker/form_builder_file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/widgets/constrained_container.dart';
-
+import 'package:admin_pro/data/uploader.dart';
 class CreateNewTask extends StatefulWidget {
   CreateNewTask({Key key}) : super(key: key);
 
@@ -28,10 +30,13 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       for (DocumentSnapshot doc in docs.documents) {
         tutor_list.add(doc['name']);
       }
-
       return tutor_list;
     }
 
+
+    Future <List<String>> uploaderHelper(List<File> files){
+      
+    }
     Future<void> addAssignment(Map<String, dynamic> m) {
       return assignments
           .add({
@@ -44,7 +49,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
             'due_date': Timestamp.fromDate(m['due_date']),
             'assigned_date': Timestamp.fromDate(DateTime.parse(m['assigned_date'])),
             'comments' : m['comments'],
-            'satus': 'ongoing'
+            'satus': 'ongoing',
           })
           .then((value) => print("Assignment Added"))
           .catchError((error) => showDialog(
@@ -268,6 +273,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                       if (_fbKey.currentState
                                           .saveAndValidate()) {
                                         print(_fbKey.currentState.value);
+                                        print(_fbKey.currentState.value.runtimeType);
                                         addAssignment(
                                             _fbKey.currentState.value);
                                       }

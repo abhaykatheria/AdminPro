@@ -53,8 +53,8 @@ class Done extends StatelessWidget {
                           subtitle: "Due " + formattedDate,
                           boxColor: LightColors.kLightGreen,
                           price: assignments[index].price,
-                          tutor: "katheria" ,
-                          a:assignments[index]
+                          tutor: "katheria" , 
+                          // a:assignments[index]
                         );
                       },
                       separatorBuilder: (BuildContext context, int index) =>

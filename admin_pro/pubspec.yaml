@@ -25,6 +25,8 @@ dependencies:
   google_fonts: ^1.1.1
   firebase_core: "0.5.2"
   cloud_firestore: "^0.14.3"
+  firebase: ^7.3.2
+  mime_type: ^0.3.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

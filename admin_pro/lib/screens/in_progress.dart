@@ -65,13 +65,14 @@ class _InProgressState extends State<InProgress> {
     );
   }
 
-  Widget _buildListItem(BuildContext context, DocumentSnapshot doc ){
+  Widget _buildListItem(BuildContext context, DocumentSnapshot doc, ){
     return TaskContainer(
                               title: doc['student'],
                               subtitle: "Due " + doc['due_date'].toDate().toString(),
                               boxColor: LightColors.kLightYellow2,
                               price: doc['price'],
-                              tutor: "katheria" ,
+                              tutor: doc['tutor'],
+                              id: doc.id,
                               // a:assignments[index]
                             );
   }
@@ -104,27 +105,25 @@ class _InProgressState extends State<InProgress> {
                   SizedBox(
                     height: 15.0,
                   ),
-                  Container(
-                    height: 125.0*assignments.length,
-                    child: StreamBuilder(
-                      stream: FirebaseFirestore.instance.collection("assignments").snapshots(),
-                      builder: (context, snapshot) {
-                        if( !snapshot.hasData) return Text("Loading.......");
-                        return 
-                        ListView.separated(
-                          itemCount: snapshot.data.documents.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            // var date = assignments[index].dueDate;
-                            // var formattedDate =
-                            //     "${date.day}-${date.month}-${date.year}";
-                            return _buildListItem(context, snapshot.data.documents[index]);
-                          },
-                          separatorBuilder: (BuildContext context, int index) =>
-                              const Divider(),
-                          physics: const NeverScrollableScrollPhysics(),
-                        );
-                      }
-                    ),
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance.collection("assignments").snapshots(),
+                    builder: (context, snapshot) {
+                      if( !snapshot.hasData) return Text("Loading.......");
+                      return 
+                      ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data.documents.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          // var date = assignments[index].dueDate;
+                          // var formattedDate =
+                          //     "${date.day}-${date.month}-${date.year}";
+                          return _buildListItem(context, snapshot.data.documents[index],);
+                        },
+                        separatorBuilder: (BuildContext context, int index) =>
+                            const Divider(),
+                        physics: const NeverScrollableScrollPhysics(),
+                      );
+                    }
                   ),
                   SizedBox(
                     height: 15.0,
@@ -133,28 +132,28 @@ class _InProgressState extends State<InProgress> {
                   SizedBox(
                     height: 15.0,
                   ),
-                  Container(
-                    height: 125.0*assignments.length,
-                    child: ListView.separated(
-                      itemCount: assignments.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        var date = assignments[index].dueDate;
-                        var formattedDate =
-                            "${date.day}-${date.month}-${date.year}";
-                        return TaskContainer(
-                          title: assignments[index].student,
-                          subtitle: "Due " + formattedDate,
-                          boxColor: LightColors.kLightGreen,
-                          price: assignments[index].price,
-                          tutor: "katheria",
-                          a: assignments[index],
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) =>
-                          const Divider(),
-                      physics: const NeverScrollableScrollPhysics(),
-                    ),
-                  ),
+                  // Container(
+                  //   height: 125.0*assignments.length,
+                  //   child: ListView.separated(
+                  //     itemCount: assignments.length,
+                  //     itemBuilder: (BuildContext context, int index) {
+                  //       var date = assignments[index].dueDate;
+                  //       var formattedDate =
+                  //           "${date.day}-${date.month}-${date.year}";
+                  //       return TaskContainer(
+                  //         title: assignments[index].student,
+                  //         subtitle: "Due " + formattedDate,
+                  //         boxColor: LightColors.kLightGreen,
+                  //         price: assignments[index].price,
+                  //         tutor: "katheria",
+                  //         a: assignments[index],
+                  //       );
+                  //     },
+                  //     separatorBuilder: (BuildContext context, int index) =>
+                  //         const Divider(),
+                  //     physics: const NeverScrollableScrollPhysics(),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

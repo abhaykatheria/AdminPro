@@ -2,6 +2,8 @@ import 'package:admin_pro/screens/create_new_task_page.dart';
 import 'package:admin_pro/screens/home.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:admin_pro/screens/tutors.dart';
+import 'package:admin_pro/screens/financials.dart';
 
 class homeview extends StatefulWidget {
   homeview({Key key}) : super(key: key);
@@ -29,7 +31,7 @@ class _homeviewState extends State<homeview> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Nav Bar")),
+      appBar: AppBar(title: Text("Admin Pro")),
       body: SizedBox.expand(
         child: PageView(
           controller: _pageController,
@@ -38,8 +40,8 @@ class _homeviewState extends State<homeview> {
           },
           children: <Widget>[
             Home(),
-            Container(color: Colors.red,),
-            Container(color: Colors.green,),
+            Financial(),
+            Tutors(),
             Container(color: Colors.blue,),
           ],
         ),
@@ -56,17 +58,18 @@ class _homeviewState extends State<homeview> {
             icon: Icon(Icons.home)
           ),
           BottomNavyBarItem(
-            title: Text('Item One'),
-            icon: Icon(Icons.apps)
+            title: Text('Financials'),
+            icon: Icon(Icons.attach_money)
           ),
           BottomNavyBarItem(
-            title: Text('Item One'),
-            icon: Icon(Icons.chat_bubble)
+            title: Text('Tutors'),
+            icon: Icon(Icons.supervised_user_circle)
           ),
           BottomNavyBarItem(
-            title: Text('Item One'),
-            icon: Icon(Icons.settings)
+            title: Text('Analysis'),
+            icon: Icon(Icons.stacked_line_chart
           ),
+          )
         ],
       ),
       floatingActionButton: FloatingActionButton(onPressed: () {

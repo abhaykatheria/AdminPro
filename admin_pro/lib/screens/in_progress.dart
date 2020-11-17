@@ -54,16 +54,6 @@ class _InProgressState extends State<InProgress> {
   // }
 
 
-  Text subheading(String title) {
-    return Text(
-      title,
-      style: TextStyle(
-          color: LightColors.kDarkBlue,
-          fontSize: 20.0,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 1.2),
-    );
-  }
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot doc, ){
     return TaskContainer(

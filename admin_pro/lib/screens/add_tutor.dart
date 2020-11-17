@@ -25,7 +25,8 @@ class _AddTutorState extends State<AddTutor> {
           .add({
             'name': m['name'], // John Doe
             'email': m['email'], // Stokes and Sons
-            'country': m['country']
+            'country': m['country'],
+            'dues': 0,
           })
           .then((value) => print("Tutor Added"))
           .catchError((error) => print("Failed to add tutor: $error"));
@@ -129,7 +130,7 @@ class _AddTutorState extends State<AddTutor> {
                                       style: TextStyle(color: Colors.white),
                                     )),
                                     height: 50.0,
-                                    width: 150.0,
+                                    width: 140.0,
                                     decoration: BoxDecoration(
                                         color: Colors.green,
                                         borderRadius:
@@ -147,7 +148,7 @@ class _AddTutorState extends State<AddTutor> {
                                       style: TextStyle(color: Colors.white),
                                     )),
                                     height: 50.0,
-                                    width: 150.0,
+                                    width: 140.0,
                                     decoration: BoxDecoration(
                                         color: Colors.red,
                                         borderRadius:

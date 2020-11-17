@@ -1,14 +1,14 @@
-import 'dart:io';
+// import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 import "package:admin_pro/widgets/data.dart";
 import 'package:admin_pro/theme/decorations.dart';
 import 'package:form_builder_file_picker/form_builder_file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/widgets/constrained_container.dart';
-import 'package:admin_pro/data/uploader.dart';
+
 class CreateNewTask extends StatefulWidget {
   CreateNewTask({Key key}) : super(key: key);
 
@@ -23,21 +23,28 @@ class _CreateNewTaskState extends State<CreateNewTask> {
   Widget build(BuildContext context) {
     CollectionReference assignments =
         FirebaseFirestore.instance.collection('assignments');
-    // CollectionReference tutors =
-    //     FirebaseFirestore.instance.collection('tutors');
+
+    CollectionReference tutors =
+        FirebaseFirestore.instance.collection('tutors');
+
+    CollectionReference dues =
+        FirebaseFirestore.instance.collection('dues');
+
+    CollectionReference payments =
+        FirebaseFirestore.instance.collection('payment_collection');
+
     List<String> _getTutorsList(BuildContext context, QuerySnapshot docs) {
       List<String> tutor_list = List();
-      for (DocumentSnapshot doc in docs.documents) {
+      for (DocumentSnapshot doc in docs.docs) {
         tutor_list.add(doc['name']);
       }
       return tutor_list;
     }
-
-
-    Future <List<String>> uploaderHelper(List<File> files){
-      
-    }
+    String _tutorid="";
     Future<void> addAssignment(Map<String, dynamic> m) {
+      
+      
+      
       return assignments
           .add({
             'student': m['student_name'],
@@ -50,12 +57,58 @@ class _CreateNewTaskState extends State<CreateNewTask> {
             'assigned_date': Timestamp.fromDate(DateTime.parse(m['assigned_date'])),
             'comments' : m['comments'],
             'satus': 'ongoing',
+            'payment_pending':true,
           })
-          .then((value) => print("Assignment Added"))
+          .then((value) {
+            print("Assignment Added");
+            
+          showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: Text('Assignment Added'),
+                  
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('Continue'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              );
+              _fbKey.currentState.reset();
+            
+            tutors.where('name' ,isEqualTo : m['tutor']  ).get().then((value) => {
+              value.docs.forEach((element) {
+                _tutorid = element.id;
+                tutors.doc(element.id).update({"dues": element['dues'] + m['tutor_fee'] });
+              })
+            }).catchError((error){print("dues not updated");});
+
+            dues.add(
+              {
+                'tutor' : m['tutor'],
+                'tutor_id' : _tutorid,
+                'due_date' : Timestamp.fromDate(m['due_date']),
+                'tutor_fee': m['tutor_fee'],
+                'assg_id' : value.id
+              }
+            ).then((value) => null);
+
+            payments.add({
+              'student' : m['student_name'],
+              'due_date' : Timestamp.fromDate(m['due_date']),
+              'status' : "pending",
+              'pending' : m['price'] - m['amount_paid'],
+              'assg_id' : value.id
+            }).then((value) => null);
+            
+          })
           .catchError((error) => showDialog(
                 context: context,
                 builder: (_) => AlertDialog(
-                  title: Text('Ooops'),
+                  title: Text(error.toString()),
                   content: SingleChildScrollView(
                     child: ListBody(
                       children: <Widget>[
@@ -268,6 +321,25 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: <Widget>[
+                                  
+                                  FlatButton(
+                                    onPressed: () {
+                                      _fbKey.currentState.reset();
+                                    },
+                                    child: Container(
+                                      child: Center(
+                                          child: Text(
+                                        "Clear fields",
+                                        style: TextStyle(color: Colors.white),
+                                      )),
+                                      height: 50.0,
+                                      width: 150.0,
+                                      decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0)),
+                                    ),
+                                  ),
                                   FlatButton(
                                     onPressed: () {
                                       if (_fbKey.currentState
@@ -292,24 +364,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                               BorderRadius.circular(10.0)),
                                     ),
                                   ),
-                                  FlatButton(
-                                    onPressed: () {
-                                      _fbKey.currentState.reset();
-                                    },
-                                    child: Container(
-                                      child: Center(
-                                          child: Text(
-                                        "Clear fields",
-                                        style: TextStyle(color: Colors.white),
-                                      )),
-                                      height: 50.0,
-                                      width: 150.0,
-                                      decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius:
-                                              BorderRadius.circular(10.0)),
-                                    ),
-                                  ),
+                                  
                                 ]),
                           )
                         ],

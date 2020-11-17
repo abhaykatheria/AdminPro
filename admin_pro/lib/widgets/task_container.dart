@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:admin_pro/screens/taskview.dart';
 
+import 'package:admin_pro/theme/colors/light_colors.dart';
+
+  Text subheading(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+          color: LightColors.kDarkBlue,
+          fontSize: 20.0,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2),
+    );
+  }
+
 class TaskContainer extends StatelessWidget {
   final String title;
   final String subtitle,tutor;
@@ -57,6 +70,79 @@ class TaskContainer extends StatelessWidget {
               children: [
                 Text("Tutor : "+tutor),
                 Padding(child: Text(price.toString()+" \$",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15.0
+                  ),
+                ),
+                padding:EdgeInsets.only(top: 10.0),),
+              ],
+            )
+
+          ],
+        ),
+        decoration: BoxDecoration(
+            color: boxColor,
+            borderRadius: BorderRadius.circular(10.0)),
+      ),
+    );
+  }
+}
+
+
+
+class TutorContainer extends StatelessWidget {
+  final String name;
+  final String country;
+  final Color boxColor;
+  final String email;
+  final int dues;
+  
+  TutorContainer({
+   this.name, this.country, this.boxColor, this.email, this.dues});
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+          onPressed: () {
+            
+          },
+          child: Container(
+        margin: EdgeInsets.symmetric(vertical: 0.0),
+        padding: EdgeInsets.all(20.0),
+        height:90.0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    email,
+                    style: TextStyle(
+                      fontSize: 10.0,
+                      color: Colors.black54,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                )
+              ],
+            ),
+
+            Column(
+              children: [
+                Text("Country : "+country),
+                Padding(child: Text("Dues : " + dues.toString()+" \$",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15.0

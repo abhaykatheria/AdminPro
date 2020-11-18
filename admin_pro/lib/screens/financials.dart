@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:admin_pro/widgets/active_project_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:admin_pro/screens/transactions.dart';
 
 class Financial extends StatefulWidget {
   Financial({Key key}) : super(key: key);
@@ -124,12 +125,7 @@ class _FinancialState extends State<Financial> {
             SizedBox(
               height: 15.0,
             ),
-            Center(
-                child: Text(
-              "\$ Financials \$",
-              style:
-                  GoogleFonts.dancingScript(textStyle: TextStyle(fontSize: 30.0)),
-            )),
+           
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -279,9 +275,14 @@ class _FinancialState extends State<Financial> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(20.0),
               child: Center(child: FlatButton(
-                onPressed: (){},
+                onPressed: (){
+                   Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>transactions()));
+                },
                 child: Container(
                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Colors.black,),
                   width: 150,

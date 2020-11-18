@@ -16,12 +16,17 @@ class _transactionsState extends State<transactions> {
     CollectionReference payments =
         FirebaseFirestore.instance.collection('payment_collection');
 
+     CollectionReference assgs =
+        FirebaseFirestore.instance.collection('assignments');
+
+
     Widget _buildListItem(
       BuildContext context,
       DocumentSnapshot doc,
     ) {
       DateTime d = doc['due_date'].toDate();
       String s = "${d.day}-${d.month}-${d.year}";
+      
       return FlatButton(
         onPressed: () {
           showDialog(
@@ -113,6 +118,52 @@ class _transactionsState extends State<transactions> {
         ),
       );
     }
+ Widget _buildListItem2(
+      BuildContext context,
+      DocumentSnapshot doc,
+    ) {
+      DateTime d = doc['due_date'].toDate();
+      String s = "${d.day}-${d.month}-${d.year}";
+
+      
+      
+      return StreamBuilder<DocumentSnapshot>(
+        stream: assgs.doc(doc['assg_id']).snapshots(),
+        builder: (context, snapshot) {
+          int ass_price = snapshot.data.data()['price'];
+          return FlatButton(
+            onPressed: () {
+              
+              
+            },
+            child: ListTile(
+              title:
+                  Text(doc['student'] + "   " + "\$ " + ass_price.toString()),
+              subtitle: Text(s),
+            ),
+          );
+        }
+      );
+    }
+
+Widget _buildListItem3(
+      BuildContext context,
+      DocumentSnapshot doc,
+    ) {
+      DateTime d = doc['due_date'].toDate();
+      String s = "${d.day}-${d.month}-${d.year}";
+      return FlatButton(
+        onPressed: () {
+          
+        },
+        child: ListTile(
+          title:
+              Text(doc['tutor'] + "   " + "\$ " + doc['tutor_fee'].toString()),
+          subtitle: Text(s),
+        ),
+      );
+    }
+    
 
     return Scaffold(
       appBar: AppBar(
@@ -211,7 +262,7 @@ class _transactionsState extends State<transactions> {
                         // var date = assignments[index].dueDate;
                         // var formattedDate =
                         //     "${date.day}-${date.month}-${date.year}";
-                        return _buildListItem(
+                        return _buildListItem2(
                           context,
                           snapshot.data.documents[index],
                         );
@@ -246,7 +297,7 @@ class _transactionsState extends State<transactions> {
                                     // var date = assignments[index].dueDate;
                                     // var formattedDate =
                                     //     "${date.day}-${date.month}-${date.year}";
-                                    return _buildListItem1(
+                                    return _buildListItem3(
                                       context,
                                       snapshot.data.documents[index],
                                     );

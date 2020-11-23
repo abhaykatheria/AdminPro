@@ -4,8 +4,9 @@ import 'package:admin_pro/widgets/task_column.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_pro/screens/in_progress.dart';
 import 'package:admin_pro/screens/done.dart';
-import 'package:admin_pro/screens/create_new_task_page.dart';
-import 'package:admin_pro/screens/add_tutor.dart';
+import 'package:admin_pro/screens/past_due.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:admin_pro/screens/all_ass.dart';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -28,6 +29,9 @@ Text subheading(String title) {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
+    CollectionReference assgs =
+        FirebaseFirestore.instance.collection('assignments');
+
     return Container(
       child: Row(
         children: [
@@ -36,6 +40,63 @@ class _HomeState extends State<Home> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      StreamBuilder(
+                          stream: assgs.snapshots(),
+                          builder: (context, snapshot) {
+                            int pendingAmount = 0;
+                            int pendingNo = 0;
+                            if (!snapshot.hasData)
+                              return Text("Loading.......");
+                            for (DocumentSnapshot doc
+                                in snapshot.data.documents) {
+                              if (doc['satus'] == 'ongoing') {
+                                pendingNo++;
+                              }
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ActiveProjectsCard(
+                                title: "ongoing assignments",
+                                subtitle: "",
+                                amount: pendingNo,
+                                cardColor: LightColors.kBlue,
+                              ),
+                            );
+                          }),
+                      StreamBuilder(
+                          stream: assgs.snapshots(),
+                          builder: (context, snapshot) {
+                            int pendingAmount = 0;
+                            if (!snapshot.hasData)
+                              return Text("Loading.......");
+                            for (DocumentSnapshot doc
+                                in snapshot.data.documents) {
+                              DateTime d = doc['due_date'].toDate();
+                              DateTime t = DateTime.now();
+                              if (d.day == t.day &&
+                                  d.month == t.month &&
+                                  d.year == t.year) {
+                                pendingAmount++;
+                              }
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ActiveProjectsCard(
+                                title: pendingAmount > 1
+                                    ? "assignments due today"
+                                    : "assignment due today",
+                                subtitle: "",
+                                amount: pendingAmount,
+                                cardColor: LightColors.kRed,
+                              ),
+                            );
+                          })
+                    ],
+                  ),
+                  SizedBox(height: 15.0),
                   Container(
                     color: Colors.transparent,
                     padding:
@@ -46,7 +107,7 @@ class _HomeState extends State<Home> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            subheading('My Tasks'),
+                            subheading('Assignments'),
                           ],
                         ),
                         SizedBox(height: 15.0),
@@ -64,13 +125,13 @@ class _HomeState extends State<Home> {
                             icon: Icons.blur_circular,
                             iconBackgroundColor: LightColors.kDarkYellow,
                             title: 'In Progress',
-                            subtitle: '1 tasks now. 1 started',
+                            subtitle: 'Ongoing assignments',
                           ),
                         ),
                         SizedBox(height: 15.0),
                         FlatButton(
                           onPressed: () {
-                              Navigator.push(
+                            Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => Done()));
@@ -79,49 +140,62 @@ class _HomeState extends State<Home> {
                             icon: Icons.check_circle_outline,
                             iconBackgroundColor: LightColors.kBlue,
                             title: 'Done',
-                            subtitle: '18 tasks now. 13 started',
+                            subtitle: 'Completed Assignments',
                           ),
                         ),
                         SizedBox(height: 15.0),
                         FlatButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PastDue()));
+                          },
                           child: TaskColumn(
                             icon: Icons.alarm,
                             iconBackgroundColor: LightColors.kRed,
                             title: 'Past Due',
-                            subtitle: '5 tasks now. 1 started',
+                            subtitle: 'Assg. Past Due and Not completed',
                           ),
                         ),
                         SizedBox(height: 30.0),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            subheading('Upcoming this week'),
-                          ],
-                        ),
-                        SizedBox(height: 15.0),
-                        Container(
-                          color: Colors.amber,
-                          height: 100.0,
-                        ),
-                        SizedBox(height: 15.0),
-                    //     FlatButton(
-                    //   onPressed: () {
-                    //       Navigator.push(
-                    //             context,
-                    //             MaterialPageRoute(
-                    //                 builder: (context) => AddTutor()));
-                    //   },
-                    //   child: Container(
-                    //       child: Center(child: Text("Add Tutor",style: TextStyle(color: Colors.white),)),
-                    //       height: 50.0,
-                    //       width: 150.0,
-                    //       decoration: BoxDecoration(
-                    //           color: Colors.red,
-                    //           borderRadius: BorderRadius.circular(10.0)),
-                    //   ),
-                    // ),
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Center(
+                            child: FlatButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AllAssignments()));
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.black,
+                                ),
+                                width: 150,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Icon(
+                                        Icons.text_snippet,
+                                        color: Colors.white,
+                                      ),
+                                      Text(
+                                        "All Assignments",
+                                        style: TextStyle(color: Colors.white),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   ),

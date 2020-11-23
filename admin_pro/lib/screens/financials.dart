@@ -12,8 +12,6 @@ class Financial extends StatefulWidget {
 }
 
 class _FinancialState extends State<Financial> {
-  
-
   @override
   Widget build(BuildContext context) {
     CollectionReference dues = FirebaseFirestore.instance.collection('dues');
@@ -21,111 +19,112 @@ class _FinancialState extends State<Financial> {
     CollectionReference payments =
         FirebaseFirestore.instance.collection('payment_collection');
 
-
-
-
     Widget _buildListItem(
-    BuildContext context,
-    DocumentSnapshot doc,
-  ) {
-    DateTime d = doc['due_date'].toDate();
-    String s = "${d.day}-${d.month}-${d.year}";
-    return FlatButton(
-      onPressed: () {
-        showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Text("Change Payment status"),
-                  
-                  content: SingleChildScrollView(
-                    child: ListBody(
-                      children: <Widget>[
-                        Text('You are about to change the status to collected'),
-                      ],
-                    ),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text('Mark Collected'),
-                      onPressed: () {
-                        payments.doc(doc.id).update({'status': 'collected'}).then((value)=>print("updated")).catchError((err)=>print(err));
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    TextButton(
-                      child: Text('Cancel'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
+      BuildContext context,
+      DocumentSnapshot doc,
+    ) {
+      DateTime d = doc['due_date'].toDate();
+      String s = "${d.day}-${d.month}-${d.year}";
+      return FlatButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: Text("Change Payment status"),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text('You are about to change the status to collected'),
                   ],
                 ),
-              );
-      },
-      child: ListTile(
-        title: Text(doc['student'] + "   " + "\$ " + doc['pending'].toString()),
-        subtitle: Text(s) ,
-      ),
-    );
-  }
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Mark Collected'),
+                  onPressed: () {
+                    payments
+                        .doc(doc.id)
+                        .update({'status': 'collected'})
+                        .then((value) => print("updated"))
+                        .catchError((err) => print(err));
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+        child: ListTile(
+          title:
+              Text(doc['student'] + "   " + "\$ " + doc['pending'].toString()),
+          subtitle: Text(s),
+        ),
+      );
+    }
 
-
-  Widget _buildListItem1(
-    BuildContext context,
-    DocumentSnapshot doc,
-  ) {
-    DateTime d = doc['due_date'].toDate();
-    String s = "${d.day}-${d.month}-${d.year}";
-    return FlatButton(
-      onPressed: () {
-
-        showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Text("Change Payment status"),
-                  
-                  content: SingleChildScrollView(
-                    child: ListBody(
-                      children: <Widget>[
-                        Text('You are about to change the status to transferred'),
-                      ],
-                    ),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text('Mark transferred'),
-                      onPressed: () {
-                        dues.doc(doc.id).update({'status': 'transferred'}).then((value)=>print("updated")).catchError((err)=>print(err));
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    TextButton(
-                      child: Text('Cancel'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
+    Widget _buildListItem1(
+      BuildContext context,
+      DocumentSnapshot doc,
+    ) {
+      DateTime d = doc['due_date'].toDate();
+      String s = "${d.day}-${d.month}-${d.year}";
+      return FlatButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: Text("Change Payment status"),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text('You are about to change the status to transferred'),
                   ],
                 ),
-              );
-
-      },
-      child: ListTile(
-        title: Text(doc['tutor'] + "   " + "\$ " + doc['tutor_fee'].toString()),
-        subtitle: Text(s) ,
-      ),
-    );
-  }
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Mark transferred'),
+                  onPressed: () {
+                    dues
+                        .doc(doc.id)
+                        .update({'status': 'transferred'})
+                        .then((value) => print("updated"))
+                        .catchError((err) => print(err));
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+        child: ListTile(
+          title:
+              Text(doc['tutor'] + "   " + "\$ " + doc['tutor_fee'].toString()),
+          subtitle: Text(s),
+        ),
+      );
+    }
 
     return Scaffold(
       body: SingleChildScrollView(
-              child: Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             SizedBox(
               height: 15.0,
             ),
-           
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -148,6 +147,7 @@ class _FinancialState extends State<Financial> {
                           subtitle: "from ${pendingNo} students",
                           amount: pendingAmount,
                           cardColor: Colors.amber,
+                          extend: "\$",
                         ),
                       );
                     }),
@@ -170,6 +170,7 @@ class _FinancialState extends State<Financial> {
                           subtitle: "to ${pendingNo} tutors",
                           amount: pendingAmount,
                           cardColor: Colors.teal,
+                          extend: "\$",
                         ),
                       );
                     })
@@ -178,10 +179,9 @@ class _FinancialState extends State<Financial> {
             Padding(
               padding: const EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
               child: Container(
-                decoration: BoxDecoration(border: Border.all(color: Colors.deepPurpleAccent),
-                borderRadius: BorderRadius.circular(12)
-                ),
-                
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.deepPurpleAccent),
+                    borderRadius: BorderRadius.circular(12)),
                 height: 320,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -198,7 +198,9 @@ class _FinancialState extends State<Financial> {
                             ),
                           ),
                           StreamBuilder(
-                            stream: payments.where('status',isEqualTo: 'pending').snapshots(),
+                            stream: payments
+                                .where('status', isEqualTo: 'pending')
+                                .snapshots(),
                             builder:
                                 (BuildContext context, AsyncSnapshot snapshot) {
                               if (!snapshot.hasData)
@@ -207,7 +209,8 @@ class _FinancialState extends State<Financial> {
                                 child: ListView.separated(
                                   shrinkWrap: true,
                                   itemCount: snapshot.data.documents.length,
-                                  itemBuilder: (BuildContext context, int index) {
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
                                     // var date = assignments[index].dueDate;
                                     // var formattedDate =
                                     //     "${date.day}-${date.month}-${date.year}";
@@ -239,10 +242,11 @@ class _FinancialState extends State<Financial> {
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 20),
                             ),
-                            
                           ),
                           StreamBuilder(
-                            stream: dues.where('status',isEqualTo: 'pending').snapshots(),
+                            stream: dues
+                                .where('status', isEqualTo: 'pending')
+                                .snapshots(),
                             builder:
                                 (BuildContext context, AsyncSnapshot snapshot) {
                               if (!snapshot.hasData)
@@ -251,7 +255,8 @@ class _FinancialState extends State<Financial> {
                                 child: ListView.separated(
                                   shrinkWrap: true,
                                   itemCount: snapshot.data.documents.length,
-                                  itemBuilder: (BuildContext context, int index) {
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
                                     // var date = assignments[index].dueDate;
                                     // var formattedDate =
                                     //     "${date.day}-${date.month}-${date.year}";
@@ -276,28 +281,39 @@ class _FinancialState extends State<Financial> {
             ),
             Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Center(child: FlatButton(
-                onPressed: (){
-                   Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>transactions()));
-                },
-                child: Container(
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Colors.black,),
-                  width: 150,
-                  
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                      Icon(Icons.text_snippet,color: Colors.white,),
-                      Text("All Transactions",style: TextStyle(color: Colors.white),)
-                    ],),
+              child: Center(
+                child: FlatButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => transactions()));
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.black,
+                    ),
+                    width: 150,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Icon(
+                            Icons.text_snippet,
+                            color: Colors.white,
+                          ),
+                          Text(
+                            "All Transactions",
+                            style: TextStyle(color: Colors.white),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
-                  ),
-              ),),
+                ),
+              ),
             )
           ],
         ),

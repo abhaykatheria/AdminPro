@@ -8,6 +8,7 @@ import 'package:admin_pro/theme/decorations.dart';
 import 'package:form_builder_file_picker/form_builder_file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/widgets/constrained_container.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class CreateNewTask extends StatefulWidget {
   CreateNewTask({Key key}) : super(key: key);
@@ -92,7 +93,8 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                 'tutor_id' : _tutorid,
                 'due_date' : Timestamp.fromDate(m['due_date']),
                 'tutor_fee': m['tutor_fee'],
-                'assg_id' : value.id
+                'assg_id' : value.id,
+                'status' : "pending"
               }
             ).then((value) => null);
 

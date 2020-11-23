@@ -4,6 +4,7 @@ import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_pro/screens/tutors.dart';
 import 'package:admin_pro/screens/financials.dart';
+import 'package:admin_pro/screens/analytics.dart';
 
 class homeview extends StatefulWidget {
   homeview({Key key}) : super(key: key);
@@ -42,7 +43,7 @@ class _homeviewState extends State<homeview> {
             Home(),
             Financial(),
             Tutors(),
-            Container(color: Colors.blue,),
+            Analytics(),
           ],
         ),
       ),
@@ -68,7 +69,7 @@ class _homeviewState extends State<homeview> {
           BottomNavyBarItem(
             title: Text('Analysis'),
             icon: Icon(Icons.stacked_line_chart
-          ),
+          ),  
           )
         ],
       ),

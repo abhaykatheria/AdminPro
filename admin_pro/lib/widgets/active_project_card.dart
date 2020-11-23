@@ -6,12 +6,14 @@ class ActiveProjectsCard extends StatelessWidget {
   final int amount;
   final String title;
   final String subtitle;
+  final String extend;
 
   ActiveProjectsCard({
     this.cardColor,
     this.amount,
     this.title,
     this.subtitle,
+    this.extend = ""
   });
 
   @override
@@ -32,7 +34,7 @@ class ActiveProjectsCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text(amount.toString() + " \$",
+              Text(amount.toString() + " " + extend,
                 style: GoogleFonts.fjallaOne(
                   textStyle : TextStyle(
                     fontSize : 50.0

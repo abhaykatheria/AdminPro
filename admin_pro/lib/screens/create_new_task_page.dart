@@ -1,14 +1,20 @@
-// import 'dart:io';
-
+import 'dart:io';
+import 'package:random_string/random_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-// import 'package:intl/intl.dart';
-import "package:admin_pro/widgets/data.dart";
 import 'package:admin_pro/theme/decorations.dart';
 import 'package:form_builder_file_picker/form_builder_file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/widgets/constrained_container.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
+
+final String username = 'abhay.katheria1998@gmail.com';
+final String password = 'Kanpur@123';
+
+final smtpServer = gmail(username, password);
 
 class CreateNewTask extends StatefulWidget {
   CreateNewTask({Key key}) : super(key: key);
@@ -20,6 +26,7 @@ class CreateNewTask extends StatefulWidget {
 class _CreateNewTaskState extends State<CreateNewTask> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final ValueChanged _onChanged = (val) => print(val);
+
   @override
   Widget build(BuildContext context) {
     CollectionReference assignments =
@@ -28,11 +35,13 @@ class _CreateNewTaskState extends State<CreateNewTask> {
     CollectionReference tutors =
         FirebaseFirestore.instance.collection('tutors');
 
-    CollectionReference dues =
-        FirebaseFirestore.instance.collection('dues');
+    CollectionReference dues = FirebaseFirestore.instance.collection('dues');
 
     CollectionReference payments =
         FirebaseFirestore.instance.collection('payment_collection');
+
+    firebase_storage.FirebaseStorage storage =
+        firebase_storage.FirebaseStorage.instance;
 
     List<String> _getTutorsList(BuildContext context, QuerySnapshot docs) {
       List<String> tutor_list = List();
@@ -41,93 +50,135 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       }
       return tutor_list;
     }
-    String _tutorid="";
+
+    Future<void> uploadFile(
+        String filePath, String file_name, String ass_id) async {
+      File file = File(filePath);
+      try {
+        await firebase_storage.FirebaseStorage.instance
+            .ref('files/' + ass_id + '/' + file_name)
+            .putFile(file);
+      } on FirebaseException catch (e) {
+        // e.g, e.code == 'canceled'
+      }
+    }
+
+    String _tutorid = "";
     Future<void> addAssignment(Map<String, dynamic> m) {
-      
-      
-      
-      return assignments
-          .add({
-            'student': m['student_name'],
-            'tutor': m['tutor'],
-            'subject' : m['subject'],
-            'price' : m['price'],
-            'amount_paid':m['amount_paid'],
-            'tutor_fee' : m["tutor_fee"],
-            'due_date': Timestamp.fromDate(m['due_date']),
-            'assigned_date': Timestamp.fromDate(DateTime.parse(m['assigned_date'])),
-            'comments' : m['comments'],
-            'satus': 'ongoing',
-            'payment_pending':true,
-          })
-          .then((value) {
-            print("Assignment Added");
-            
-          showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Text('Assignment Added'),
-                  
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text('Continue'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
+      String ass_id = randomString(10);
+      var files_dict = m['files'];
+      String file_links = "";
+      for (String file_name in files_dict.keys) {
+        uploadFile(files_dict[file_name], file_name, ass_id);
+      }
+
+      return assignments.add({
+        'ass_id': ass_id,
+        'student': m['student_name'],
+        'tutor': m['tutor'],
+        'subject': m['subject'],
+        'price': m['price'],
+        'amount_paid': m['amount_paid'],
+        'tutor_fee': m["tutor_fee"],
+        'due_date': Timestamp.fromDate(m['due_date']),
+        'assigned_date': Timestamp.fromDate(DateTime.parse(m['assigned_date'])),
+        'comments': m['comments'],
+        'satus': 'ongoing',
+        'payment_pending': true,
+        'time_zone': m['time_zone']
+      }).then((value) {
+        print("Assignment Added");
+        print(m);
+        Iterable<Attachment> toAt(Iterable<String> attachments) =>
+      (attachments ?? []).map((a) => FileAttachment(File(a)));
+
+        final message = Message()
+          ..from = Address(username, 'Abhay Bhai')
+          ..recipients.add('abhaykatheria01@gmail.com')
+          ..subject = 'New Assignment:: 😀 :: ${DateTime.now()}'
+          ..text = 'This is the plain text.\nThis is line 2 of the text part.'
+          ..html = "<h1>Test</h1>\n<p>Hey! Here's some HTML content</p>"
+          ..attachments.addAll(toAt(m['files'].values as Iterable<String>))
+          ;
+
+        try {
+          final sendReport =  send(message, smtpServer);
+          print('Message sent: ' + sendReport.toString());
+        } on MailerException catch (e) {
+          print('Message not sent.');
+          for (var p in e.problems) {
+            print('Problem: ${p.code}: ${p.msg}');
+          }
+        }
+
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('Assignment Added'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Continue'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+        _fbKey.currentState.reset();
+
+        tutors
+            .where('name', isEqualTo: m['tutor'])
+            .get()
+            .then((value) => {
+                  value.docs.forEach((element) {
+                    _tutorid = element.id;
+                    tutors
+                        .doc(element.id)
+                        .update({"dues": element['dues'] + m['tutor_fee']});
+                  })
+                })
+            .catchError((error) {
+          print("dues not updated");
+        });
+
+        dues.add({
+          'tutor': m['tutor'],
+          'tutor_id': _tutorid,
+          'due_date': Timestamp.fromDate(m['due_date']),
+          'tutor_fee': m['tutor_fee'],
+          'assg_id': value.id,
+          'status': "pending"
+        }).then((value) => null);
+
+        payments.add({
+          'student': m['student_name'],
+          'due_date': Timestamp.fromDate(m['due_date']),
+          'status': "pending",
+          'pending': m['price'] - m['amount_paid'],
+          'assg_id': value.id
+        }).then((value) => null);
+      }).catchError((error) => showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: Text(error.toString()),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text('Try Again Please'),
                   ],
                 ),
-              );
-              _fbKey.currentState.reset();
-            
-            tutors.where('name' ,isEqualTo : m['tutor']  ).get().then((value) => {
-              value.docs.forEach((element) {
-                _tutorid = element.id;
-                tutors.doc(element.id).update({"dues": element['dues'] + m['tutor_fee'] });
-              })
-            }).catchError((error){print("dues not updated");});
-
-            dues.add(
-              {
-                'tutor' : m['tutor'],
-                'tutor_id' : _tutorid,
-                'due_date' : Timestamp.fromDate(m['due_date']),
-                'tutor_fee': m['tutor_fee'],
-                'assg_id' : value.id,
-                'status' : "pending"
-              }
-            ).then((value) => null);
-
-            payments.add({
-              'student' : m['student_name'],
-              'due_date' : Timestamp.fromDate(m['due_date']),
-              'status' : "pending",
-              'pending' : m['price'] - m['amount_paid'],
-              'assg_id' : value.id
-            }).then((value) => null);
-            
-          })
-          .catchError((error) => showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Text(error.toString()),
-                  content: SingleChildScrollView(
-                    child: ListBody(
-                      children: <Widget>[
-                        Text('Try Again Please'),
-                      ],
-                    ),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text('Continue'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Continue'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                 ),
-              ));
+              ],
+            ),
+          ));
     }
 
     return Scaffold(
@@ -153,37 +204,6 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           SizedBox(
                             height: 15.0,
                           ),
-                          // FormBuilderTypeAhead<Tutor>(
-                          //   decoration: getTextDecoration("Tutor"),
-                          //   initialValue: contacts[0],
-                          //   attribute: 'tutor',
-                          //   onChanged: _onChanged,
-                          //   itemBuilder: (context, Tutor tutor) {
-                          //     return ListTile(
-                          //       title: Text(tutor.name),
-                          //       subtitle: Text(tutor.email),
-                          //     );
-                          //   },
-                          //   selectionToTextTransformer: (Tutor c) => c.email,
-                          //   suggestionsCallback: (query) {
-                          //     if (query.isNotEmpty) {
-                          //       var lowercaseQuery = query.toLowerCase();
-                          //       return contacts.where((tutor) {
-                          //         return tutor.name
-                          //             .toLowerCase()
-                          //             .contains(lowercaseQuery);
-                          //       }).toList(growable: false)
-                          //         ..sort((a, b) => a.name
-                          //             .toLowerCase()
-                          //             .indexOf(lowercaseQuery)
-                          //             .compareTo(b.name
-                          //                 .toLowerCase()
-                          //                 .indexOf(lowercaseQuery)));
-                          //     } else {
-                          //       return contacts;
-                          //     }
-                          //   },
-                          // ),
                           StreamBuilder<Object>(
                               stream: FirebaseFirestore.instance
                                   .collection("tutors")
@@ -205,36 +225,10 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           SizedBox(
                             height: 15.0,
                           ),
-                          FormBuilderTypeAhead(
+                          FormBuilderTextField(
+                            attribute: "time_zone",
+                            maxLines: 1,
                             decoration: getTextDecoration("Time Zone"),
-                            initialValue: contacts[0],
-                            attribute: 'time_zone',
-                            onChanged: _onChanged,
-                            itemBuilder: (context, Tutor tutor) {
-                              return ListTile(
-                                title: Text(tutor.name),
-                                subtitle: Text(tutor.email),
-                              );
-                            },
-                            selectionToTextTransformer: (Tutor c) => c.email,
-                            suggestionsCallback: (query) {
-                              if (query.isNotEmpty) {
-                                var lowercaseQuery = query.toLowerCase();
-                                return contacts.where((tutor) {
-                                  return tutor.name
-                                      .toLowerCase()
-                                      .contains(lowercaseQuery);
-                                }).toList(growable: false)
-                                  ..sort((a, b) => a.name
-                                      .toLowerCase()
-                                      .indexOf(lowercaseQuery)
-                                      .compareTo(b.name
-                                          .toLowerCase()
-                                          .indexOf(lowercaseQuery)));
-                              } else {
-                                return contacts;
-                              }
-                            },
                           ),
                           SizedBox(
                             height: 15.0,
@@ -323,7 +317,6 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: <Widget>[
-                                  
                                   FlatButton(
                                     onPressed: () {
                                       _fbKey.currentState.reset();
@@ -347,7 +340,8 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                       if (_fbKey.currentState
                                           .saveAndValidate()) {
                                         print(_fbKey.currentState.value);
-                                        print(_fbKey.currentState.value.runtimeType);
+                                        print(_fbKey
+                                            .currentState.value.runtimeType);
                                         addAssignment(
                                             _fbKey.currentState.value);
                                       }
@@ -366,7 +360,6 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                               BorderRadius.circular(10.0)),
                                     ),
                                   ),
-                                  
                                 ]),
                           )
                         ],
@@ -380,15 +373,3 @@ class _CreateNewTaskState extends State<CreateNewTask> {
     );
   }
 }
-// RaisedButton(
-//                                   child: Text('Submit'),
-//                                   onPressed: () {
-//                                     if (_fbKey.currentState.saveAndValidate()) {
-//                                       print(_fbKey.currentState.value);
-//                                     }
-//                                   }),
-//                               RaisedButton(
-//                                   child: Text("Clear"),
-//                                   onPressed: () {
-//                                     _fbKey.currentState.reset();
-//                                   })

@@ -20,6 +20,21 @@ class _DailiCollectionsState extends State<DailiCollections> {
 
   @override
   Widget build(BuildContext context) {
+
+    final List<Color> color = <Color>[];
+        color.add(Colors.blue[50]);
+        color.add(Colors.blue[200]);
+        color.add(Colors.blue);
+
+        final List<double> stops = <double>[];
+        stops.add(0.0);
+        stops.add(0.5);
+        stops.add(1.0);
+
+        final LinearGradient gradientColors =
+            LinearGradient(colors: color, stops: stops);
+
+            
     return Container(
       height: 250,
       child: StreamBuilder<QuerySnapshot>(

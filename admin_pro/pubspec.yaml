@@ -23,13 +23,15 @@ dependencies:
   form_builder_file_picker: ^0.3.0
   flutter_slidable: ^0.5.7
   google_fonts: ^1.1.1
-  firebase_core: "0.5.2"
+  firebase_core: "0.5.2+1"
   cloud_firestore: "^0.14.3"
-  firebase_storage: "^5.0.1"
+  firebase_storage: ^5.1.0
   firebase: ^7.3.2
+  random_string: ^2.1.0
   mime_type: ^0.3.2
   expandable: ^4.1.4
   syncfusion_flutter_charts: ^18.3.50
+  mailer: ^3.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

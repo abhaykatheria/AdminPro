@@ -37,7 +37,7 @@ class ActiveProjectsCard extends StatelessWidget {
               Text(amount.toString() + " " + extend,
                 style: GoogleFonts.fjallaOne(
                   textStyle : TextStyle(
-                    fontSize : 50.0
+                    fontSize : 40.0
                   )
                 ),
               ),

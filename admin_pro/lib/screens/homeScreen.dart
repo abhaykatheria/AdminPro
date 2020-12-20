@@ -5,6 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:admin_pro/screens/tutors.dart';
 import 'package:admin_pro/screens/financials.dart';
 import 'package:admin_pro/screens/analytics.dart';
+import 'package:admin_pro/screens/add_timed_ass.dart';
+import 'package:flutter/rendering.dart';
+import 'students.dart';
+
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+
 
 class homeview extends StatefulWidget {
   homeview({Key key}) : super(key: key);
@@ -16,12 +22,17 @@ class homeview extends StatefulWidget {
 class _homeviewState extends State<homeview> {
   int _currentIndex = 0;
   PageController _pageController;
-
+  void setDialVisible(bool value) {
+    setState(() {
+      dialVisible = value;
+    });
+  }
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
   }
+  bool dialVisible = true;
 
   @override
   void dispose() {
@@ -44,6 +55,7 @@ class _homeviewState extends State<homeview> {
             Financial(),
             Tutors(),
             Analytics(),
+            Students()
           ],
         ),
       ),
@@ -70,15 +82,49 @@ class _homeviewState extends State<homeview> {
             title: Text('Analysis'),
             icon: Icon(Icons.stacked_line_chart
           ),  
+          ),
+          BottomNavyBarItem(
+            title: Text('Students'),
+            icon: Icon(Icons.school
+          ),  
           )
         ],
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {
-        Navigator.push(
+      floatingActionButton: SpeedDial(
+      animatedIcon: AnimatedIcons.add_event,
+      animatedIconTheme: IconThemeData(size: 22.0),
+      // child: Icon(Icons.add),
+      onOpen: () => print('OPENING DIAL'),
+      onClose: () => print('DIAL CLOSED'),
+      visible: dialVisible,
+      curve: Curves.bounceIn,
+      children: [
+        SpeedDialChild(
+          child: Icon(Icons.pending_actions, color: Colors.white),
+          backgroundColor: Colors.deepOrange,
+          onTap: () {
+            Navigator.push(
+                    context, MaterialPageRoute(builder: (context) =>
+                    AddTimed()));
+          },
+          label: 'Timed',
+          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+          labelBackgroundColor: Colors.deepOrangeAccent,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.assignment, color: Colors.white),
+          backgroundColor: Colors.green,
+          onTap: () {
+            Navigator.push(
                     context, MaterialPageRoute(builder: (context) =>
                     CreateNewTask()));
-        },
-      child: Icon(Icons.add),),
+          },
+          label: 'Assignment',
+          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+          labelBackgroundColor: Colors.green,
+        ),
+      ],
+    ),
     );
   }
 }

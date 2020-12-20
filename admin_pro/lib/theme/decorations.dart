@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-InputDecoration getTextDecoration(String label) {
+InputDecoration getTextDecoration({String label, String prefix=""}) {
   return InputDecoration(
     labelStyle: TextStyle(color: Colors.black45),
     border: OutlineInputBorder(),
     labelText: label,
+    prefix: Text(prefix)
   );
 }
 

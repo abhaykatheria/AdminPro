@@ -8,22 +8,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/widgets/constrained_container.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
-
-final String username = 'abhay.katheria1998@gmail.com';
-final String password = 'Kanpur@123';
-
-final smtpServer = gmail(username, password);
-
-class CreateNewTask extends StatefulWidget {
-  CreateNewTask({Key key}) : super(key: key);
+class AddTimed extends StatefulWidget {
+  AddTimed({Key key}) : super(key: key);
 
   @override
-  _CreateNewTaskState createState() => _CreateNewTaskState();
+  _AddTimedState createState() => _AddTimedState();
 }
 
-class _CreateNewTaskState extends State<CreateNewTask> {
+class _AddTimedState extends State<AddTimed> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final ValueChanged _onChanged = (val) => print(val);
 
@@ -89,27 +81,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       }).then((value) {
         print("Assignment Added");
         print(m);
-        Iterable<Attachment> toAt(Iterable<String> attachments) =>
-      (attachments ?? []).map((a) => FileAttachment(File(a)));
-
-        final message = Message()
-          ..from = Address(username, 'Abhay Bhai')
-          ..recipients.add('abhaykatheria01@gmail.com')
-          ..subject = 'New Assignment:: 😀 :: ${DateTime.now()}'
-          ..text = 'This is the plain text.\nThis is line 2 of the text part.'
-          ..html = "<h1>Test</h1>\n<p>Hey! Here's some HTML content</p>"
-          ..attachments.addAll(toAt(m['files'].values as Iterable<String>))
-          ;
-
-        try {
-          final sendReport =  send(message, smtpServer);
-          print('Message sent: ' + sendReport.toString());
-        } on MailerException catch (e) {
-          print('Message not sent.');
-          for (var p in e.problems) {
-            print('Problem: ${p.code}: ${p.msg}');
-          }
-        }
+        
 
         showDialog(
           context: context,
@@ -183,7 +155,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add assignment"),
+        title: Text("Add Timed"),
       ),
       body: CenteredView(
         child: SafeArea(
@@ -200,6 +172,9 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                             attribute: 'student_name',
                             maxLines: 1,
                             decoration: getTextDecoration(label:"students name"),
+                            validators: [
+                              FormBuilderValidators.maxLength(12)
+                            ],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -211,7 +186,6 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData)
                                   return Text("Loading.......");
-
                                 return FormBuilderDropdown(
                                   attribute: 'tutor',
                                   decoration: getTextDecoration(label:'Tutor'),
@@ -228,7 +202,10 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           FormBuilderTextField(
                             attribute: "time_zone",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Time Zone",prefix: "UTC + "),
+                            decoration: getTextDecoration(label:"Time Zone",prefix:"UTC +  "),
+                            validators: [
+                            ],
+                            
                           ),
                           SizedBox(
                             height: 15.0,
@@ -237,6 +214,9 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                             attribute: "subject",
                             maxLines: 1,
                             decoration: getTextDecoration(label:"Subject"),
+                            validators: [
+                              FormBuilderValidators.maxLength(12)
+                            ],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -246,6 +226,9 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                             maxLines: 1,
                             decoration: getTextDecoration(label:"Price"),
                             valueTransformer: (value) => int.parse(value),
+                            validators: [
+                              FormBuilderValidators.numeric()
+                            ],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -255,6 +238,9 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                             maxLines: 1,
                             decoration: getTextDecoration(label:"Amount Paid"),
                             valueTransformer: (value) => int.parse(value),
+                            validators: [
+                              FormBuilderValidators.numeric()
+                            ],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -290,6 +276,9 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                             attribute: "comments",
                             maxLines: 1,
                             decoration: getTextDecoration(label:"Comments"),
+                            validators: [
+                              FormBuilderValidators.maxLength(30)
+                            ],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -349,7 +338,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                     child: Container(
                                       child: Center(
                                           child: Text(
-                                        "Add Assignment",
+                                        "Add Timed",
                                         style: TextStyle(color: Colors.white),
                                       )),
                                       height: 50.0,

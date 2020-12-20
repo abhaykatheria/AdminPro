@@ -4,32 +4,30 @@ import 'package:admin_pro/theme/decorations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/widgets/constrained_container.dart';
 
-class AddTutor extends StatefulWidget {
-  AddTutor({Key key}) : super(key: key);
 
+class AddStudent extends StatefulWidget {
   @override
-  _AddTutorState createState() => _AddTutorState();
+  _AddStudentState createState() => _AddStudentState();
 }
 
-class _AddTutorState extends State<AddTutor> {
+class _AddStudentState extends State<AddStudent> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final ValueChanged _onChanged = (val) => print(val);
   @override
   Widget build(BuildContext context) {
-    CollectionReference tutors =
-        FirebaseFirestore.instance.collection('tutors');
+    CollectionReference students =
+        FirebaseFirestore.instance.collection('students');
 
-    Future<void> addTutor(Map<String, dynamic> m) {
+    Future<void> addStudent(Map<String, dynamic> m) {
       // Call the user's CollectionReference to add a new user
-      return tutors
+      return students
           .add({
             'name': m['name'], // John Doe
             'email': m['email'], // Stokes and Sons
-            'country': m['country'],
             'dues': 0,
           })
-          .then((value) => print("Tutor Added"))
-          .catchError((error) => print("Failed to add tutor: $error"));
+          .then((value) => print("Student Added"))
+          .catchError((error) => print("Failed to add student: $error"));
     }
 
     return CenteredView(
@@ -40,7 +38,7 @@ class _AddTutorState extends State<AddTutor> {
               children: [
                 SizedBox(height: 15.0),
                 Text(
-                  "Add Tutor",
+                  "Add Student",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 30.0,
@@ -59,34 +57,20 @@ class _AddTutorState extends State<AddTutor> {
                         FormBuilderTextField(
                           attribute: 'name',
                           maxLines: 1,
-                          decoration: getTextDecoration(label:"Tutor's name"),
+                          decoration: getTextDecoration(label:"Student's name"),
                         ),
                         SizedBox(
                           height: 15.0,
                         ),
                         FormBuilderTextField(
                           attribute: "email",
-                          decoration: getTextDecoration(label:"Tutor's email"),
+                          decoration: getTextDecoration(label:"Student's email"),
                           validators: [FormBuilderValidators.email()],
                         ),
                         SizedBox(
                           height: 15.0,
                         ),
-                        FormBuilderCountryPicker(
-                          // initialValue: 'Germany',
-                          attribute: 'country',
-                          // readOnly: true,
-                          // style: TextStyle(color: Colors.black, fontSize: 18),
-                          priorityListByIsoCode: ['US'],
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Country',
-                          ),
-                          validators: [
-                            FormBuilderValidators.required(
-                                errorText: 'This field required.'),
-                          ],
-                        ),
+                    
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0),
                           child: Row(
@@ -95,7 +79,7 @@ class _AddTutorState extends State<AddTutor> {
                                 FlatButton(
                                   onPressed: () {
                                     if (_fbKey.currentState.saveAndValidate()) {
-                                      addTutor(_fbKey.currentState.value);
+                                      addStudent(_fbKey.currentState.value);
                                       showDialog(
                                         context: context,
                                         builder: (_) => AlertDialog(

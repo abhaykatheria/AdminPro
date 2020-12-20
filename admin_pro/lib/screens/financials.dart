@@ -211,9 +211,7 @@ class _FinancialState extends State<Financial> {
                                   itemCount: snapshot.data.documents.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    // var date = assignments[index].dueDate;
-                                    // var formattedDate =
-                                    //     "${date.day}-${date.month}-${date.year}";
+                                    
                                     return _buildListItem(
                                       context,
                                       snapshot.data.documents[index],

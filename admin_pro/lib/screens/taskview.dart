@@ -106,7 +106,8 @@ Future<void> updateDate(BuildContext context) async {
                         child: Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                                colors: [LightColors.kGreen, Colors.blue]),
+                                colors: [LightColors.kGreen, Colors.blue]
+                                ),
                             backgroundBlendMode: BlendMode.darken,
                             borderRadius: BorderRadius.circular(12.0),
                           ),

@@ -21,8 +21,8 @@ class _AddTimedState extends State<AddTimed> {
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference assignments =
-        FirebaseFirestore.instance.collection('assignments');
+    CollectionReference timed =
+        FirebaseFirestore.instance.collection('timed');
 
     CollectionReference tutors =
         FirebaseFirestore.instance.collection('tutors');
@@ -56,23 +56,24 @@ class _AddTimedState extends State<AddTimed> {
     }
 
     String _tutorid = "";
-    Future<void> addAssignment(Map<String, dynamic> m) {
-      String ass_id = randomString(10);
-      var files_dict = m['files'];
+    Future<void> addTimed(Map<String, dynamic> m) {
+      String timed_id = randomString(10);
+      /*var files_dict = m['files'];
       String file_links = "";
       for (String file_name in files_dict.keys) {
         uploadFile(files_dict[file_name], file_name, ass_id);
-      }
+      }*/
 
-      return assignments.add({
-        'ass_id': ass_id,
+      return timed.add({
+        'ass_id': timed_id,
         'student': m['student_name'],
         'tutor': m['tutor'],
         'subject': m['subject'],
         'price': m['price'],
         'amount_paid': m['amount_paid'],
         'tutor_fee': m["tutor_fee"],
-        'due_date': Timestamp.fromDate(m['due_date']),
+        'start_date': Timestamp.fromDate(m['start_date']),
+        'duration': m['duration'],
         'assigned_date': Timestamp.fromDate(DateTime.parse(m['assigned_date'])),
         'comments': m['comments'],
         'satus': 'ongoing',
@@ -86,7 +87,7 @@ class _AddTimedState extends State<AddTimed> {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: Text('Assignment Added'),
+            title: Text('Timed Added'),
             actions: <Widget>[
               TextButton(
                 child: Text('Continue'),
@@ -255,15 +256,26 @@ class _AddTimedState extends State<AddTimed> {
                             height: 15.0,
                           ),
                           FormBuilderDateTimePicker(
-                            attribute: "due_date",
+                            attribute: "start_date",
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: "Due date",
+                                labelText: "Start date",
                                 suffixIcon: Icon(Icons.calendar_today)),
                           ),
                           SizedBox(
                             height: 15.0,
                           ),
+
+                          FormBuilderTextField(
+                            attribute: "duration",
+                            maxLines: 1,
+                            decoration: getTextDecoration(label:"Duration (Hours:Minutes)"),
+                            //valueTransformer: (){},
+                          ),
+                          SizedBox(
+                            height: 15.0,
+                          ),
+
                           FormBuilderTextField(
                             attribute: "assigned_date",
                             maxLines: 1,
@@ -331,7 +343,7 @@ class _AddTimedState extends State<AddTimed> {
                                         print(_fbKey.currentState.value);
                                         print(_fbKey
                                             .currentState.value.runtimeType);
-                                        addAssignment(
+                                        addTimed(
                                             _fbKey.currentState.value);
                                       }
                                     },

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter_duration_picker/flutter_duration_picker.dart';
 import 'package:random_string/random_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -18,7 +19,7 @@ class AddTimed extends StatefulWidget {
 class _AddTimedState extends State<AddTimed> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final ValueChanged _onChanged = (val) => print(val);
-
+  Duration _duration = Duration(hours: 0, minutes: 0);
   @override
   Widget build(BuildContext context) {
     CollectionReference timed =
@@ -56,7 +57,7 @@ class _AddTimedState extends State<AddTimed> {
     }
 
     String _tutorid = "";
-    Future<void> addTimed(Map<String, dynamic> m) {
+    Future<void> addTimed(Map<String, dynamic> m, Duration duration) {
       String timed_id = randomString(10);
       /*var files_dict = m['files'];
       String file_links = "";
@@ -73,7 +74,7 @@ class _AddTimedState extends State<AddTimed> {
         'amount_paid': m['amount_paid'],
         'tutor_fee': m["tutor_fee"],
         'start_date': Timestamp.fromDate(m['start_date']),
-        'duration': m['duration'],
+        'duration': duration.toString(),
         'assigned_date': Timestamp.fromDate(DateTime.parse(m['assigned_date'])),
         'comments': m['comments'],
         'satus': 'ongoing',
@@ -153,7 +154,7 @@ class _AddTimedState extends State<AddTimed> {
             ),
           ));
     }
-
+    
     return Scaffold(
       appBar: AppBar(
         title: Text("Add Timed"),
@@ -265,13 +266,14 @@ class _AddTimedState extends State<AddTimed> {
                           SizedBox(
                             height: 15.0,
                           ),
-
-                          FormBuilderTextField(
-                            attribute: "duration",
-                            maxLines: 1,
-                            decoration: getTextDecoration(label:"Duration (Hours:Minutes)"),
-                            //valueTransformer: (){},
-                          ),
+                          Text("Duration"),
+                          DurationPicker(
+              duration: _duration,
+              onChange: (val) {
+                this.setState(() => _duration = val);
+              },
+              snapToMins: 5.0,
+            ),
                           SizedBox(
                             height: 15.0,
                           ),
@@ -344,7 +346,7 @@ class _AddTimedState extends State<AddTimed> {
                                         print(_fbKey
                                             .currentState.value.runtimeType);
                                         addTimed(
-                                            _fbKey.currentState.value);
+                                            _fbKey.currentState.value,_duration);
                                       }
                                     },
                                     child: Container(

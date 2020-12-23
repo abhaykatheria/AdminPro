@@ -23,8 +23,9 @@ class _AddStudentState extends State<AddStudent> {
       return students
           .add({
             'name': m['name'], // John Doe
-            'email': m['email'], // Stokes and Sons
-            'dues': 0,
+            'email': m['email'],
+            'time_zone' : m['time_zone'], // Stokes and Sons
+            'collections': 0,
           })
           .then((value) => print("Student Added"))
           .catchError((error) => print("Failed to add student: $error"));
@@ -70,7 +71,14 @@ class _AddStudentState extends State<AddStudent> {
                         SizedBox(
                           height: 15.0,
                         ),
-                    
+                        FormBuilderTextField(
+                            attribute: "time_zone",
+                            maxLines: 1,
+                            decoration: getTextDecoration(label:"Time Zone",prefix: "UTC + "),
+                          ),
+                          SizedBox(
+                          height: 15.0,
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0),
                           child: Row(
@@ -90,7 +98,7 @@ class _AddStudentState extends State<AddStudent> {
                                               children: <Widget>[
                                                 
                                                 Text(
-                                                    'Tutor has been Added'),
+                                                    'Student has been Added'),
                                               ],
                                             ),
                                           ),
@@ -110,7 +118,7 @@ class _AddStudentState extends State<AddStudent> {
                                   child: Container(
                                     child: Center(
                                         child: Text(
-                                      "Add Tutor",
+                                      "Add Student",
                                       style: TextStyle(color: Colors.white),
                                     )),
                                     height: 50.0,

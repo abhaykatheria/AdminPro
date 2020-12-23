@@ -33,6 +33,7 @@ dependencies:
   syncfusion_flutter_charts: ^18.3.50
   mailer: ^3.2.1
   flutter_speed_dial: ^1.2.5
+  flutter_duration_picker: ^1.0.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

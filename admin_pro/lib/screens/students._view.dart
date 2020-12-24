@@ -124,6 +124,9 @@ class _StudentsViewState extends State<StudentsView> {
                                   borderRadius: BorderRadius.circular(10.0)),
                             ),
                           ),
+                          SizedBox(height: 12,),
+
+
                         ],
                       ),
                     ],

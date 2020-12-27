@@ -4,6 +4,7 @@ import 'package:admin_pro/widgets/data.dart';
 import 'package:expandable/expandable.dart';
 import 'package:admin_pro/widgets/task_container.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:admin_pro/screens/timed_container.dart';
 
 class TimedDueToday extends StatefulWidget {
   @override
@@ -27,7 +28,7 @@ class _TimedDueTodayState extends State<TimedDueToday> {
       BuildContext context,
       DocumentSnapshot doc,
       ) {
-    return TaskContainer(
+    return TimedContainer(
       title: doc['student'],
       subtitle: "Due " + doc['start_date'].toDate().toString(),
       boxColor: LightColors.kPalePink,

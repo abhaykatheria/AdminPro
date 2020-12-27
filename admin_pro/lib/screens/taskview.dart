@@ -221,7 +221,7 @@ Future<void> updateDate(BuildContext context) async {
                           children: [
                             FlatButton(
                               onPressed: () {
-                                  updateStatus('Completed');
+                                  updateStatus('completed');
                                   Navigator.of(context).pop();
                               },
                               child: Container(
@@ -239,7 +239,7 @@ Future<void> updateDate(BuildContext context) async {
                             ),
                             FlatButton(
                               onPressed: () {
-                                updateStatus('Incomplete');
+                                updateStatus('incomplete');
                                 //deleteAssignment() ;
                                 Navigator.of(context).pop();
                                 },

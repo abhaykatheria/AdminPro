@@ -77,7 +77,7 @@ class _AssDueTodayState extends State<AssDueToday> {
                           DateTime t = DateTime.now();
                           if (d.day == t.day &&
                               d.month == t.month &&
-                              d.year == t.year) {
+                              d.year == t.year && doc['satus']=='ongoing') {
                             dc.add(doc);
                           }
                         }

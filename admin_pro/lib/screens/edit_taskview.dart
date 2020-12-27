@@ -29,23 +29,23 @@ class EditTaskView extends StatefulWidget {
 class _EditTaskViewState extends State<EditTaskView> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final ValueChanged _onChanged = (val) => print(val);
-  Map<dynamic,dynamic> assMap;
+  // Map<dynamic,dynamic> assMap;
 
-  Future<void> getAssignmentList() async {
-    var result = await FirebaseFirestore.instance
-        .collection('assignments').doc(widget.id).get();
+  // Future<void> getAssignmentList() async {
+  //   var result = await FirebaseFirestore.instance
+  //       .collection('assignments').doc(widget.id).get();
 
-      assMap = result.data();
-    //print(assMap['ass_id']);
-  }
+  //     assMap = result.data();
+  //   //print(assMap['ass_id']);
+  // }
 
-  @override
-  void initState() {
-    setState(() {
-      getAssignmentList();
-    });
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   setState(() {
+  //     getAssignmentList();
+  //   });
+  //   super.initState();
+  // }
 
 
   @override
@@ -211,145 +211,152 @@ class _EditTaskViewState extends State<EditTaskView> {
       ),
       body: CenteredView(
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                FormBuilder(
-                    key: _fbKey,
-                    child: Padding(
-                      padding: const EdgeInsets.all(1.0),
-                      child: Column(
-                        children: <Widget>[
-                          FormBuilderTextField(
-                            attribute: 'student_name',
-                            maxLines: 1,
-                            decoration: getTextDecoration(label:assMap['student']),
-                          ),
-                          SizedBox(
-                            height: 15.0,
-                          ),
-                          StreamBuilder<Object>(
-                              stream: FirebaseFirestore.instance
-                                  .collection("tutors")
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (!snapshot.hasData)
-                                  return Text("Loading.......");
+          child: FutureBuilder<DocumentSnapshot>(
+            future: FirebaseFirestore.instance
+        .collection('assignments').doc(widget.id).get(),
+            builder: (context, snapshot) {
+              Map<dynamic,dynamic> assMap = snapshot.data.data();
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    FormBuilder(
+                        key: _fbKey,
+                        child: Padding(
+                          padding: const EdgeInsets.all(1.0),
+                          child: Column(
+                            children: <Widget>[
+                              FormBuilderTextField(
+                                attribute: 'student_name',
+                                maxLines: 1,
+                                decoration: getTextDecoration(label:assMap['student']),
+                              ),
+                              SizedBox(
+                                height: 15.0,
+                              ),
+                              StreamBuilder<Object>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection("tutors")
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData)
+                                      return Text("Loading.......");
 
-                                return FormBuilderDropdown(
-                                  attribute: 'tutor',
-                                  decoration: getTextDecoration(label:'Tutor'),
-                                  items: _getTutorsList(context, snapshot.data)
-                                      .map((gender) => DropdownMenuItem(
-                                      value: gender,
-                                      child: Text("$gender")))
-                                      .toList(),
-                                );
-                              }),
-                          SizedBox(
-                            height: 15.0,
+                                    return FormBuilderDropdown(
+                                      attribute: 'tutor',
+                                      decoration: getTextDecoration(label:'Tutor'),
+                                      items: _getTutorsList(context, snapshot.data)
+                                          .map((gender) => DropdownMenuItem(
+                                          value: gender,
+                                          child: Text("$gender")))
+                                          .toList(),
+                                    );
+                                  }),
+                              SizedBox(
+                                height: 15.0,
+                              ),
+                              FormBuilderTextField(
+                                attribute: "subject",
+                                maxLines: 1,
+                                decoration: getTextDecoration(label:assMap['subject']),
+                              ),
+                              SizedBox(
+                                height: 15.0,
+                              ),
+                              FormBuilderTextField(
+                                attribute: "price",
+                                maxLines: 1,
+                                decoration: getTextDecoration(label:assMap['price'].toString()),
+                                valueTransformer: (value) => int.parse(value),
+                              ),
+                              SizedBox(
+                                height: 15.0,
+                              ),
+                              FormBuilderTextField(
+                                attribute: "amount_paid",
+                                maxLines: 1,
+                                decoration: getTextDecoration(label:assMap['amount_paid'].toString()),
+                                valueTransformer: (value) => int.parse(value),
+                              ),
+                              SizedBox(
+                                height: 15.0,
+                              ),
+                              FormBuilderTextField(
+                                attribute: "tutor_fee",
+                                maxLines: 1,
+                                decoration: getTextDecoration(label:assMap['tutor_fee'].toString()),
+                                valueTransformer: (value) => int.parse(value),
+                              ),
+                              SizedBox(
+                                height: 15.0,
+                              ),
+                              FormBuilderDateTimePicker(
+                                attribute: "due_date",
+                                decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: "Due date",
+                                    suffixIcon: Icon(Icons.calendar_today)),
+                              ),
+                              SizedBox(
+                                height: 15.0,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10.0),
+                                child: Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                    children: <Widget>[
+                                      FlatButton(
+                                        onPressed: () {
+                                          _fbKey.currentState.reset();
+                                        },
+                                        child: Container(
+                                          child: Center(
+                                              child: Text(
+                                                "Clear fields",
+                                                style: TextStyle(color: Colors.white),
+                                              )),
+                                          height: 50.0,
+                                          width: 150.0,
+                                          decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              borderRadius:
+                                              BorderRadius.circular(10.0)),
+                                        ),
+                                      ),
+                                      FlatButton(
+                                        onPressed: () {
+                                          if (_fbKey.currentState
+                                              .saveAndValidate()) {
+                                            print(_fbKey.currentState.value);
+                                            print(_fbKey
+                                                .currentState.value.runtimeType);
+                                            UpdateAssignment(
+                                                _fbKey.currentState.value);
+                                          }
+                                        },
+                                        child: Container(
+                                          child: Center(
+                                              child: Text(
+                                                "Update",
+                                                style: TextStyle(color: Colors.white),
+                                              )),
+                                          height: 50.0,
+                                          width: 150.0,
+                                          decoration: BoxDecoration(
+                                              color: Colors.green,
+                                              borderRadius:
+                                              BorderRadius.circular(10.0)),
+                                        ),
+                                      ),
+                                    ]),
+                              )
+                            ],
                           ),
-                          FormBuilderTextField(
-                            attribute: "subject",
-                            maxLines: 1,
-                            decoration: getTextDecoration(label:assMap['subject']),
-                          ),
-                          SizedBox(
-                            height: 15.0,
-                          ),
-                          FormBuilderTextField(
-                            attribute: "price",
-                            maxLines: 1,
-                            decoration: getTextDecoration(label:assMap['price'].toString()),
-                            valueTransformer: (value) => int.parse(value),
-                          ),
-                          SizedBox(
-                            height: 15.0,
-                          ),
-                          FormBuilderTextField(
-                            attribute: "amount_paid",
-                            maxLines: 1,
-                            decoration: getTextDecoration(label:assMap['amount_paid'].toString()),
-                            valueTransformer: (value) => int.parse(value),
-                          ),
-                          SizedBox(
-                            height: 15.0,
-                          ),
-                          FormBuilderTextField(
-                            attribute: "tutor_fee",
-                            maxLines: 1,
-                            decoration: getTextDecoration(label:assMap['tutor_fee'].toString()),
-                            valueTransformer: (value) => int.parse(value),
-                          ),
-                          SizedBox(
-                            height: 15.0,
-                          ),
-                          FormBuilderDateTimePicker(
-                            attribute: "due_date",
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: "Due date",
-                                suffixIcon: Icon(Icons.calendar_today)),
-                          ),
-                          SizedBox(
-                            height: 15.0,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceEvenly,
-                                children: <Widget>[
-                                  FlatButton(
-                                    onPressed: () {
-                                      _fbKey.currentState.reset();
-                                    },
-                                    child: Container(
-                                      child: Center(
-                                          child: Text(
-                                            "Clear fields",
-                                            style: TextStyle(color: Colors.white),
-                                          )),
-                                      height: 50.0,
-                                      width: 150.0,
-                                      decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                    ),
-                                  ),
-                                  FlatButton(
-                                    onPressed: () {
-                                      if (_fbKey.currentState
-                                          .saveAndValidate()) {
-                                        print(_fbKey.currentState.value);
-                                        print(_fbKey
-                                            .currentState.value.runtimeType);
-                                        UpdateAssignment(
-                                            _fbKey.currentState.value);
-                                      }
-                                    },
-                                    child: Container(
-                                      child: Center(
-                                          child: Text(
-                                            "Update",
-                                            style: TextStyle(color: Colors.white),
-                                          )),
-                                      height: 50.0,
-                                      width: 150.0,
-                                      decoration: BoxDecoration(
-                                          color: Colors.green,
-                                          borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                    ),
-                                  ),
-                                ]),
-                          )
-                        ],
-                      ),
-                    )),
-              ],
-            ),
+                        )),
+                  ],
+                ),
+              );
+            }
           ),
         ),
       ),

@@ -39,6 +39,8 @@ class _CreateNewTaskState extends State<CreateNewTask> {
 
     CollectionReference payments =
         FirebaseFirestore.instance.collection('payment_collection');
+    CollectionReference students =
+        FirebaseFirestore.instance.collection('students');
 
     firebase_storage.FirebaseStorage storage =
         firebase_storage.FirebaseStorage.instance;
@@ -195,11 +197,41 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                       padding: const EdgeInsets.all(1.0),
                       child: Column(
                         children: <Widget>[
-                          FormBuilderTextField(
-                            attribute: 'student_name',
-                            maxLines: 1,
-                            decoration: getTextDecoration(label:"students name"),
-                          ),
+                         StreamBuilder<Object>(
+                              stream: students
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData)
+                                  return Text("Loading.......");
+                                List<String> students_list = _getTutorsList(context, snapshot.data);
+                                return FormBuilderTypeAhead(
+              decoration: getTextDecoration(label:"Student",prefix: ""),
+              attribute: 'student',
+              onChanged: _onChanged,
+              itemBuilder: (context, student) {
+                return ListTile(
+                  title: Text(student),
+                );
+              },
+              controller: TextEditingController(text: ''),
+              
+              suggestionsCallback: (query) {
+                if (query.isNotEmpty) {
+                  var lowercaseQuery = query.toLowerCase();
+                  return students_list.where((student) {
+                    return student.toLowerCase().contains(lowercaseQuery);
+                  }).toList(growable: false)
+                    ..sort((a, b) => a
+                        .toLowerCase()
+                        .indexOf(lowercaseQuery)
+                        .compareTo(
+                            b.toLowerCase().indexOf(lowercaseQuery)));
+                } else {
+                  return students_list;
+                }
+              },
+            );
+                              }),
                           SizedBox(
                             height: 15.0,
                           ),
@@ -210,16 +242,34 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData)
                                   return Text("Loading.......");
-
-                                return FormBuilderDropdown(
-                                  attribute: 'tutor',
-                                  decoration: getTextDecoration(label:'Tutor'),
-                                  items: _getTutorsList(context, snapshot.data)
-                                      .map((gender) => DropdownMenuItem(
-                                          value: gender,
-                                          child: Text("$gender")))
-                                      .toList(),
-                                );
+                                List<String> tutors_list = _getTutorsList(context, snapshot.data);
+                                return FormBuilderTypeAhead(
+              decoration:getTextDecoration(label:"Tutor",prefix: ""),
+              attribute: 'tutor',
+              onChanged: _onChanged,
+              itemBuilder: (context, tutor) {
+                return ListTile(
+                  title: Text(tutor),
+                );
+              },
+              controller: TextEditingController(text: ''),
+              
+              suggestionsCallback: (query) {
+                if (query.isNotEmpty) {
+                  var lowercaseQuery = query.toLowerCase();
+                  return tutors_list.where((tutor) {
+                    return tutor.toLowerCase().contains(lowercaseQuery);
+                  }).toList(growable: false)
+                    ..sort((a, b) => a
+                        .toLowerCase()
+                        .indexOf(lowercaseQuery)
+                        .compareTo(
+                            b.toLowerCase().indexOf(lowercaseQuery)));
+                } else {
+                  return tutors_list;
+                }
+              },
+            );
                               }),
                           SizedBox(
                             height: 15.0,

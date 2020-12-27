@@ -30,6 +30,7 @@ class _AllAssignmentsState extends State<AllAssignments> {
   ) {
     DateTime d = doc['due_date'].toDate();
     String s = "${d.day}-${d.month}-${d.year}";
+    print(doc['price']);
     return TaskContainer(
       title: doc['student'],
       subtitle: "Due " + s + " status : " + doc['satus'],

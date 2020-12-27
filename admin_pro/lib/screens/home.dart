@@ -8,6 +8,9 @@ import 'package:admin_pro/screens/done.dart';
 import 'package:admin_pro/screens/past_due.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/screens/all_ass.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:admin_pro/theme/decorations.dart';
+import 'package:admin_pro/screens/students._view.dart';
 
 import 'ass_today_due.dart';
 
@@ -17,7 +20,12 @@ class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
+class Student{
+  final name;
+  final id;
 
+  Student(this.name, this.id);
+}
 Text subheading(String title) {
   return Text(
     title,
@@ -30,15 +38,34 @@ Text subheading(String title) {
 }
 
 class _HomeState extends State<Home> {
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  final ValueChanged _onChanged = (val) => print(val);
+
+
   @override
   Widget build(BuildContext context) {
     CollectionReference assgs =
         FirebaseFirestore.instance.collection('assignments');
-
+  List<String> _getTutorsList(BuildContext context, QuerySnapshot docs) {
+      List<String> tutor_list = List();
+      for (DocumentSnapshot doc in docs.docs) {
+        tutor_list.add(doc['name']);
+      }
+      return tutor_list;
+    }
+  List<String> _getIdList(BuildContext context, QuerySnapshot docs) {
+      List<String> tutor_list = List();
+      for (DocumentSnapshot doc in docs.docs) {
+        tutor_list.add(doc.id);
+      }
+      return tutor_list;
+    }
 
     CollectionReference timed =
     FirebaseFirestore.instance.collection('timed');
 
+  CollectionReference students =
+    FirebaseFirestore.instance.collection('students');
 
     return Container(
       child: Row(
@@ -48,6 +75,49 @@ class _HomeState extends State<Home> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
+                  SizedBox(height : 15.0),
+                  StreamBuilder<Object>(
+                              stream: students
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData)
+                                  return Text("Loading.......");
+                                List<String> students_list = _getTutorsList(context, snapshot.data);
+                                List<String> id_list = _getIdList(context, snapshot.data);
+                                return FormBuilderTypeAhead(
+              decoration: getTextDecoration(label:"Student",prefix: ""),
+              attribute: 'student',
+              onChanged: _onChanged,
+              itemBuilder: (context, student) {
+                return ListTile(
+                  title: Text(student),
+                  onTap: () {
+                    Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => StudentsView(id:id_list[students_list.indexOf(student)])));
+                  },
+                );
+              },
+              controller: TextEditingController(text: ''),
+              
+              suggestionsCallback: (query) {
+                if (query.isNotEmpty) {
+                  var lowercaseQuery = query.toLowerCase();
+                  return students_list.where((student) {
+                    return student.toLowerCase().contains(lowercaseQuery);
+                  }).toList(growable: false)
+                    ..sort((a, b) => a
+                        .toLowerCase()
+                        .indexOf(lowercaseQuery)
+                        .compareTo(
+                            b.toLowerCase().indexOf(lowercaseQuery)));
+                } else {
+                  return students_list;
+                }
+              },
+            );
+                              }),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

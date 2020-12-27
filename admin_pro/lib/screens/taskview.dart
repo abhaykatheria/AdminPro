@@ -76,9 +76,6 @@ Future<void> updateDate(BuildContext context) async {
     }
 }
 
-
-
-
     return FutureBuilder<DocumentSnapshot>(
         future: assignments.doc(widget.id).get(),
         builder: (context, snapshot) {

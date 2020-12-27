@@ -43,6 +43,7 @@ class _InProgressState extends State<InProgress> {
     BuildContext context,
     DocumentSnapshot doc,
   ) {
+    print(doc['student']);
     return TaskContainer(
       title: doc['student'],
       subtitle: "Due " + doc['due_date'].toDate().toString(),

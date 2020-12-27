@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:admin_pro/screens/add_tutor.dart';
 import 'package:admin_pro/widgets/task_container.dart';
 import 'package:admin_pro/theme/colors/light_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

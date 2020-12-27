@@ -222,8 +222,8 @@ class _TimedViewState extends State<TimedView> {
                           children: [
                             FlatButton(
                               onPressed: () {
-                                updateStatus('Completed');
-                                Navigator.of(context).pop();
+                                updateStatus('completed').whenComplete(() => Navigator.of(context).pop());
+
                               },
                               child: Container(
                                 child: Center(
@@ -240,9 +240,8 @@ class _TimedViewState extends State<TimedView> {
                             ),
                             FlatButton(
                               onPressed: () {
-                                updateStatus('Incomplete');
+                                updateStatus('incomplete').whenComplete(() => Navigator.of(context).pop());
                                 //deleteAssignment() ;
-                                Navigator.of(context).pop();
                               },
                               child: Container(
                                 child: Center(

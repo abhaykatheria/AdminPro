@@ -215,6 +215,8 @@ class _EditTaskViewState extends State<EditTaskView> {
             future: FirebaseFirestore.instance
         .collection('assignments').doc(widget.id).get(),
             builder: (context, snapshot) {
+              if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+
               Map<dynamic,dynamic> assMap = snapshot.data.data();
               return SingleChildScrollView(
                 child: Column(

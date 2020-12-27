@@ -42,6 +42,8 @@ class _MonthlyCollectionsState extends State<MonthlyCollections> {
           stream:
               FirebaseFirestore.instance.collection("assignments").snapshots(),
           builder: (context, snapshot) {
+            if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+
             m.clear();
             for (DocumentSnapshot doc in snapshot.data.docs) {
               if (m[doc['assigned_date'].toDate().month] == null) {

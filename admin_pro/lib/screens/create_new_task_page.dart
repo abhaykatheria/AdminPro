@@ -71,7 +71,6 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       for (String file_name in files_dict.keys) {
         uploadFile(files_dict[file_name], file_name, ass_id);
       }*/
-
       return assignments.add({
         'ass_id': ass_id,
         'student': m['student_name'],

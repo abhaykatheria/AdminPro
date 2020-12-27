@@ -1,3 +1,4 @@
+import 'package:admin_pro/screens/timed_today_due.dart';
 import 'package:admin_pro/theme/colors/light_colors.dart';
 import 'package:admin_pro/widgets/active_project_card.dart';
 import 'package:admin_pro/widgets/task_column.dart';
@@ -7,6 +8,8 @@ import 'package:admin_pro/screens/done.dart';
 import 'package:admin_pro/screens/past_due.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/screens/all_ass.dart';
+
+import 'ass_today_due.dart';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -32,6 +35,11 @@ class _HomeState extends State<Home> {
     CollectionReference assgs =
         FirebaseFirestore.instance.collection('assignments');
 
+
+    CollectionReference timed =
+    FirebaseFirestore.instance.collection('timed');
+
+
     return Container(
       child: Row(
         children: [
@@ -52,29 +60,41 @@ class _HomeState extends State<Home> {
                               return Text("Loading.......");
                             for (DocumentSnapshot doc
                                 in snapshot.data.documents) {
-                              if (doc['satus'] == 'ongoing') {
+                              DateTime d = doc['due_date'].toDate();
+                              DateTime t = DateTime.now();
+                              if (d.day == t.day &&
+                                  d.month == t.month &&
+                                  d.year == t.year){
                                 pendingNo++;
                               }
                             }
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: ActiveProjectsCard(
-                                title: "ongoing assignments",
-                                subtitle: "",
-                                amount: pendingNo,
-                                cardColor: LightColors.kBlue,
+                              child: GestureDetector(
+                                onTap: (){
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => AssDueToday()));
+                                },
+                                child: ActiveProjectsCard(
+                                  title: "Assignments due today",
+                                  subtitle: "",
+                                  amount: pendingNo,
+                                  cardColor: LightColors.kBlue,
+                                ),
                               ),
                             );
                           }),
                       StreamBuilder(
-                          stream: assgs.snapshots(),
+                          stream: timed.snapshots(),
                           builder: (context, snapshot) {
                             int pendingAmount = 0;
                             if (!snapshot.hasData)
                               return Text("Loading.......");
                             for (DocumentSnapshot doc
                                 in snapshot.data.documents) {
-                              DateTime d = doc['due_date'].toDate();
+                              DateTime d = doc['start_date'].toDate();
                               DateTime t = DateTime.now();
                               if (d.day == t.day &&
                                   d.month == t.month &&
@@ -84,13 +104,21 @@ class _HomeState extends State<Home> {
                             }
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: ActiveProjectsCard(
-                                title: pendingAmount > 1
-                                    ? "assignments due today"
-                                    : "assignment due today",
-                                subtitle: "",
-                                amount: pendingAmount,
-                                cardColor: LightColors.kRed,
+                              child: GestureDetector(
+                                onTap: (){
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => TimedDueToday()));
+                                },
+                                child: ActiveProjectsCard(
+                                  title: pendingAmount > 1
+                                      ? "Timed ass sch. today"
+                                      : "Timed ass sch. today",
+                                  subtitle: "",
+                                  amount: pendingAmount,
+                                  cardColor: LightColors.kRed,
+                                ),
                               ),
                             );
                           })

@@ -87,7 +87,7 @@ Future<void> updateDate(BuildContext context) async {
           }
 
           if (snapshot.connectionState != ConnectionState.done) {
-            return Text("loading");
+            if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
           }
           Map<String, dynamic> data = snapshot.data.data();
           

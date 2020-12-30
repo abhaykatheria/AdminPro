@@ -2,6 +2,7 @@ import 'package:admin_pro/screens/edit_taskview.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_pro/widgets/data.dart';
 import 'package:admin_pro/theme/colors/light_colors.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:admin_pro/theme/decorations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,6 +32,21 @@ class _TaskViewState extends State<TaskView> {
   Widget build(BuildContext context) {
     CollectionReference assignments =
         FirebaseFirestore.instance.collection('assignments');
+
+    CollectionReference tutors =
+    FirebaseFirestore.instance.collection('tutors');
+
+    Map<dynamic,dynamic> tutor_email;
+
+    Future<String> getEmail(String name) async{
+
+      QuerySnapshot q = await tutors.where("name",isEqualTo: name).get();
+
+      return q.docs[0]['email'];
+
+
+    }
+
 
     String formatDate(Timestamp t){
       DateTime d = t.toDate();
@@ -213,6 +229,39 @@ Future<void> updateDate(BuildContext context) async {
                           ),
                         ),
                         Divider(),
+                        FlatButton(
+                          onPressed: () async{
+                           String name = await getEmail(
+                               data['tutor']
+                           );
+                           final Email email = Email(
+                             body: '',
+                             subject: 'Feedback/Suggestion/Bug reporting',
+                             recipients: [name],
+                             //cc: ['cc@example.com'],
+                             //bcc: ['bcc@example.com'],
+                             //attachmentPaths: ['/path/to/attachment.zip'],
+                             isHTML: false,
+                           );
+
+                           await FlutterEmailSender.send(email);
+
+
+                          },
+                          child: Container(
+                            child: Center(
+                                child: Text(
+                                  "Send mail to tutor",
+                                  style: TextStyle(color: Colors.white),
+                                )),
+                            height: 50.0,
+                            width: 150.0,
+                            decoration: BoxDecoration(
+                                color: Colors.deepOrangeAccent,
+                                borderRadius: BorderRadius.circular(10.0)),
+                          ),
+                        ),
+                        Divider(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -237,13 +286,13 @@ Future<void> updateDate(BuildContext context) async {
                               onPressed: () {
                                 updateStatus('incomplete').whenComplete(() => Navigator.of(context).pop());
                                 //deleteAssignment() ;
-                                },
+                              },
                               child: Container(
                                 child: Center(
                                     child: Text(
-                                  "Mark Incomplete",
-                                  style: TextStyle(color: Colors.white),
-                                )),
+                                      "Mark Incomplete",
+                                      style: TextStyle(color: Colors.white),
+                                    )),
                                 height: 50.0,
                                 width: 150.0,
                                 decoration: BoxDecoration(

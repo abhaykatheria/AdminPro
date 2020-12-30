@@ -82,7 +82,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
         'amount_paid': m['amount_paid'],
         'tutor_fee': m["tutor_fee"],
         'due_date': Timestamp.fromDate(m['due_date']),
-        'assigned_date': Timestamp.fromDate(DateTime.parse(m['assigned_date'])),
+        'assigned_date': Timestamp.fromDate(m['assigned_date']),
         'comments': m['comments'],
         'satus': 'ongoing',
         'payment_pending': true,
@@ -206,7 +206,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                 List<String> students_list = _getTutorsList(context, snapshot.data);
                                 return FormBuilderTypeAhead(
               decoration: getTextDecoration(label:"Student",prefix: ""),
-              attribute: 'student',
+              attribute: 'student_name',
               onChanged: _onChanged,
               itemBuilder: (context, student) {
                 return ListTile(
@@ -327,13 +327,20 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           SizedBox(
                             height: 15.0,
                           ),
-                          FormBuilderTextField(
+                          FormBuilderDateTimePicker(
+                            attribute: "assigned_date",
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: "Assigned Date",
+                                suffixIcon: Icon(Icons.calendar_today)),
+                          ),
+                          /*FormBuilderTextField(
                             attribute: "assigned_date",
                             maxLines: 1,
                             decoration: getTextDecoration(label:"Assigned Date"),
-                            initialValue: DateTime.now().toString(),
-                            readOnly: true,
-                          ),
+                           *//* initialValue: DateTime.now().toString(),
+                            readOnly: false,*//*
+                          ),*/
                           SizedBox(height: 15.0),
                           FormBuilderTextField(
                             attribute: "comments",

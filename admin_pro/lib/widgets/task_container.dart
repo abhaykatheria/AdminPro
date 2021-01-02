@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:admin_pro/screens/taskview.dart';
-import 'package:admin_pro/screens/students._view.dart';
+import 'package:admin_pro/screens/students_view.dart';
 import 'package:admin_pro/theme/colors/light_colors.dart';
-
+import 'package:admin_pro/screens/tutor_view.dart';
   Text subheading(String title) {
     return Text(
       title,
@@ -100,15 +100,19 @@ class TutorContainer extends StatelessWidget {
   final Color boxColor;
   final String email;
   final int dues;
-  
+  final String id;
+
   TutorContainer({
-   this.name, this.country, this.boxColor, this.email, this.dues});
+  this.name, this.country, this.boxColor, this.email, this.dues, this.id});
 
   @override
   Widget build(BuildContext context) {
     return FlatButton(
           onPressed: () {
-            
+             Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => TutorView(id:id)));
           },
           child: Container(
         margin: EdgeInsets.symmetric(vertical: 0.0),
@@ -127,7 +131,6 @@ class TutorContainer extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0),
                   child: Text(
@@ -141,7 +144,6 @@ class TutorContainer extends StatelessWidget {
                 )
               ],
             ),
-
             Column(
               children: [
                 Text("Country : "+country),
@@ -154,7 +156,6 @@ class TutorContainer extends StatelessWidget {
                 padding:EdgeInsets.only(top: 10.0),),
               ],
             )
-
           ],
         ),
         decoration: BoxDecoration(
@@ -177,6 +178,7 @@ class StudentsContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlatButton(
           onPressed: () {
+            print(id);
             Navigator.push(
                                 context,
                                 MaterialPageRoute(

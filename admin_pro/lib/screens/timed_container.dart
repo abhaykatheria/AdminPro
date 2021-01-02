@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:admin_pro/screens/taskview.dart';
-import 'package:admin_pro/screens/students._view.dart';
+import 'package:admin_pro/screens/students_view.dart';
 import 'package:admin_pro/theme/colors/light_colors.dart';
 import 'package:admin_pro/screens/timedview.dart';
 Text subheading(String title) {

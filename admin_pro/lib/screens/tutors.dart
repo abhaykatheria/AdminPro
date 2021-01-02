@@ -19,8 +19,8 @@ class _TutorsState extends State<Tutors> {
       email: doc['email'],
       country: doc['country'],
       boxColor: LightColors.kLightGreen,
-      dues : doc['dues']
-      
+      dues : doc['dues'],
+      id : doc.id
     );
   }
     return Scaffold(
@@ -29,7 +29,7 @@ class _TutorsState extends State<Tutors> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => AddTutor()));
-       },
+      },
         icon: Icon(Icons.add), label: Text('Add Tutor'),backgroundColor: Colors.red[500],heroTag: "btn1",
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -41,7 +41,17 @@ class _TutorsState extends State<Tutors> {
               child: Column(
                 children: <Widget>[
                   
-                  subheading("Tutors"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      subheading("Tutors"),
+                      
+                    ],
+                  ),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  
                   SizedBox(
                     height: 15.0,
                   ),
@@ -50,18 +60,68 @@ class _TutorsState extends State<Tutors> {
                     builder: (context, snapshot) {
                       if( !snapshot.hasData) return Text("Loading.......");
                       return 
-                      ListView.separated(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data.documents.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          // var date = assignments[index].dueDate;
-                          // var formattedDate =
-                          //     "${date.day}-${date.month}-${date.year}";
-                          return _buildListItem(context, snapshot.data.documents[index],);
-                        },
-                        separatorBuilder: (BuildContext context, int index) =>
-                            const Divider(color: Colors.black,),
-                        physics: const NeverScrollableScrollPhysics(),
+                      Column(
+                        children: [
+                          FlatButton(
+                          onPressed: () {
+                            showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('Mark all tutors Paid'),
+            content: Text("This will mark all tutors paid"),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Continue'),
+                onPressed: () {
+                  for(DocumentSnapshot doc in snapshot.data.documents){
+                    FirebaseFirestore.instance.collection("tutors").doc(doc.id).update({
+                      'dues' : 0
+                    })
+    .then((value) => print("status Updated"))
+    .catchError((error) => print("Failed to update user: $error"));
+                  }
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+                          },
+                          child: Container(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("Mark All Tutors Paid"),
+                                    Icon(Icons.check_box),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: LightColors.kBlue,
+                            ),
+                          ),
+                      ),
+                      SizedBox(height: 15.0,),
+                          ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: snapshot.data.documents.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              // var date = assignments[index].dueDate;
+                              // var formattedDate =
+                              //     "${date.day}-${date.month}-${date.year}";
+                              return _buildListItem(context, snapshot.data.documents[index],);
+                            },
+                            separatorBuilder: (BuildContext context, int index) =>
+                                const Divider(color: Colors.black,),
+                            physics: const NeverScrollableScrollPhysics(),
+                          ),
+                        ],
                       );
                     }
                   ),

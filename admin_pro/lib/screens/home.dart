@@ -10,7 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/screens/all_ass.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:admin_pro/theme/decorations.dart';
-import 'package:admin_pro/screens/students._view.dart';
+import 'package:admin_pro/screens/students_view.dart';
 
 import 'ass_today_due.dart';
 

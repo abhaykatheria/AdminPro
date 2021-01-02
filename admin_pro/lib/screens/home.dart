@@ -164,7 +164,7 @@ class _HomeState extends State<Home> {
                               return Text("Loading.......");
                             for (DocumentSnapshot doc
                                 in snapshot.data.documents) {
-                              DateTime d = doc['start_date'].toDate();
+                              DateTime d = doc['due_date'].toDate();
                               DateTime t = DateTime.now();
                               if (d.day == t.day &&
                                   d.month == t.month &&
@@ -250,13 +250,28 @@ class _HomeState extends State<Home> {
                                     builder: (context) => PastDue()));
                           },
                           child: TaskColumn(
-                            icon: Icons.alarm,
+                            icon: Icons.block,
                             iconBackgroundColor: LightColors.kRed,
                             title: 'Past Due',
                             subtitle: 'Assg. Past Due and Not completed',
                           ),
                         ),
-                        SizedBox(height: 30.0),
+                        SizedBox(height: 15.0),
+                        FlatButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PastDue()));
+                          },
+                          child: TaskColumn(
+                            icon: Icons.alarm,
+                            iconBackgroundColor: LightColors.kDarkBlue,
+                            title: 'Timed Assignments',
+                            subtitle: '',
+                          ),
+                        ),
+                        SizedBox(height: 10.0),
                         Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: Center(

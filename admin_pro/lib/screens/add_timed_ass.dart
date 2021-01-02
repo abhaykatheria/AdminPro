@@ -73,7 +73,7 @@ class _AddTimedState extends State<AddTimed> {
         'price': m['price'],
         'amount_paid': m['amount_paid'],
         'tutor_fee': m["tutor_fee"],
-        'start_date': Timestamp.fromDate(m['start_date']),
+        'due_date': Timestamp.fromDate(m['start_date']),
         'duration': duration.toString(),
         'assigned_date': Timestamp.fromDate(DateTime.parse(m['assigned_date'])),
         'comments': m['comments'],

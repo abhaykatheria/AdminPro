@@ -5,13 +5,12 @@ import 'package:expandable/expandable.dart';
 import 'package:admin_pro/widgets/task_container.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/screens/timed_container.dart';
-
-class TimedDueToday extends StatefulWidget {
+class AllTimed extends StatefulWidget {
   @override
-  _TimedDueTodayState createState() => _TimedDueTodayState();
+  _AllTimedState createState() => _AllTimedState();
 }
 
-class _TimedDueTodayState extends State<TimedDueToday> {
+class _AllTimedState extends State<AllTimed> {
 
   Text subheading(String title) {
     return Text(
@@ -44,10 +43,6 @@ class _TimedDueTodayState extends State<TimedDueToday> {
   Widget build(BuildContext context) {
     CollectionReference timed =
     FirebaseFirestore.instance.collection('timed');
-
-
-    List<DocumentSnapshot> dc = new List();
-
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -59,7 +54,7 @@ class _TimedDueTodayState extends State<TimedDueToday> {
                   children: <Widget>[
                     SizedBox(height: 15.0),
                     Text(
-                      "Due Today",
+                      "Timed Assignments",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 30.0,
@@ -70,25 +65,14 @@ class _TimedDueTodayState extends State<TimedDueToday> {
                       stream: timed.snapshots(),
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if (!snapshot.hasData) return Text("Loading.......");
-
-                        for (DocumentSnapshot doc
-                        in snapshot.data.documents) {
-                          DateTime d = doc['due_date'].toDate();
-                          DateTime t = DateTime.now();
-                          if (d.day == t.day &&
-                              d.month == t.month &&
-                              d.year == t.year && doc['satus']=='ongoing') {
-                            dc.add(doc);
-                          }
-                        }
                         return ListView.separated(
                           shrinkWrap: true,
-                          itemCount: dc.length,
+                          itemCount: snapshot.data.documents.length,
                           itemBuilder: (BuildContext context, int index) {
 
                             return _buildListItem(
                               context,
-                              dc[index],
+                              snapshot.data.documents[index],
                             );
                           },
                           separatorBuilder:

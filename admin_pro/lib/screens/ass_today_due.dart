@@ -43,8 +43,7 @@ class _AssDueTodayState extends State<AssDueToday> {
   Widget build(BuildContext context) {
     CollectionReference assgs =
     FirebaseFirestore.instance.collection('assignments');
-    DateTime n = DateTime.now();
-    DateTime n1 = DateTime.parse("${n.year}-${n.month}-${n.day} 00:00:00Z");
+
 
     List<DocumentSnapshot> dc = new List();
 

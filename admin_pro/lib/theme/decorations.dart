@@ -18,7 +18,7 @@ Row taskviewfield({String field, String value }){
       Text(field+" :    ",
         style: GoogleFonts.ubuntu(
           textStyle: TextStyle(
-              fontSize: 20.0,
+              fontSize: 15.0,
             color: Colors.white
           )
         ),
@@ -26,7 +26,7 @@ Row taskviewfield({String field, String value }){
       Text(value,
         style: GoogleFonts.oxygenMono(
           textStyle: TextStyle(
-            fontSize: 20.0,
+            fontSize: 15.0,
           )
         ),
       ),

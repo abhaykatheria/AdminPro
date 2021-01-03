@@ -36,6 +36,9 @@ class _AddTimedState extends State<AddTimed> {
     firebase_storage.FirebaseStorage storage =
         firebase_storage.FirebaseStorage.instance;
 
+    CollectionReference students =
+    FirebaseFirestore.instance.collection('students');
+
     List<String> _getTutorsList(BuildContext context, QuerySnapshot docs) {
       List<String> tutor_list = List();
       for (DocumentSnapshot doc in docs.docs) {
@@ -170,14 +173,41 @@ class _AddTimedState extends State<AddTimed> {
                       padding: const EdgeInsets.all(1.0),
                       child: Column(
                         children: <Widget>[
-                          FormBuilderTextField(
-                            attribute: 'student_name',
-                            maxLines: 1,
-                            decoration: getTextDecoration(label:"students name"),
-                            validators: [
-                              FormBuilderValidators.maxLength(12)
-                            ],
-                          ),
+                          StreamBuilder<Object>(
+                              stream: students
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData)
+                                  return Text("Loading.......");
+                                List<String> students_list = _getTutorsList(context, snapshot.data);
+                                return FormBuilderTypeAhead(
+                                  decoration: getTextDecoration(label:"Student",prefix: ""),
+                                  attribute: 'student_name',
+                                  onChanged: _onChanged,
+                                  itemBuilder: (context, student) {
+                                    return ListTile(
+                                      title: Text(student),
+                                    );
+                                  },
+                                  controller: TextEditingController(text: ''),
+
+                                  suggestionsCallback: (query) {
+                                    if (query.isNotEmpty) {
+                                      var lowercaseQuery = query.toLowerCase();
+                                      return students_list.where((student) {
+                                        return student.toLowerCase().contains(lowercaseQuery);
+                                      }).toList(growable: false)
+                                        ..sort((a, b) => a
+                                            .toLowerCase()
+                                            .indexOf(lowercaseQuery)
+                                            .compareTo(
+                                            b.toLowerCase().indexOf(lowercaseQuery)));
+                                    } else {
+                                      return students_list;
+                                    }
+                                  },
+                                );
+                              }),
                           SizedBox(
                             height: 15.0,
                           ),

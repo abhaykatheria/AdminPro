@@ -11,6 +11,7 @@ import 'package:admin_pro/screens/all_ass.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:admin_pro/theme/decorations.dart';
 import 'package:admin_pro/screens/students_view.dart';
+import 'package:admin_pro/screens/all_timed.dart';
 
 import 'ass_today_due.dart';
 
@@ -262,7 +263,7 @@ class _HomeState extends State<Home> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => PastDue()));
+                                    builder: (context) => AllTimed()));
                           },
                           child: TaskColumn(
                             icon: Icons.alarm,

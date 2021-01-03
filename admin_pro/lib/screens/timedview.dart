@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:admin_pro/theme/decorations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/screens/edit_timedview.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 
 class TimedView extends StatefulWidget {
   TimedView({Key key, this.id}) : super(key: key);
@@ -32,6 +33,21 @@ class _TimedViewState extends State<TimedView> {
   Widget build(BuildContext context) {
     CollectionReference timed =
     FirebaseFirestore.instance.collection('timed');
+
+    CollectionReference tutors =
+    FirebaseFirestore.instance.collection('tutors');
+
+    Map<dynamic,dynamic> tutor_email;
+
+    Future<String> getEmail(String name) async{
+
+      QuerySnapshot q = await tutors.where("name",isEqualTo: name).get();
+
+      return q.docs[0]['email'];
+
+
+    }
+
 
     String formatDate(Timestamp t){
       DateTime d = t.toDate();
@@ -185,7 +201,7 @@ class _TimedViewState extends State<TimedView> {
                                     height: 12.0,
                                   ),
                                   taskviewfield(
-                                      field: "Start Date", value: formatDate(data['start_date'])),
+                                      field: "Start Date", value: formatDate(data['due_date'])),
                                   SizedBox(height: 25.0),
                                   taskviewfield(
                                       field: "Status", value: data['satus']),
@@ -213,6 +229,39 @@ class _TimedViewState extends State<TimedView> {
                             width: 320.0,
                             decoration: BoxDecoration(
                                 color: Colors.red,
+                                borderRadius: BorderRadius.circular(10.0)),
+                          ),
+                        ),
+                        Divider(),
+                        FlatButton(
+                          onPressed: () async{
+                            String name = await getEmail(
+                                data['tutor']
+                            );
+                            final Email email = Email(
+                              body: '',
+                              subject: 'Feedback/Suggestion/Bug reporting',
+                              recipients: [name],
+                              //cc: ['cc@example.com'],
+                              //bcc: ['bcc@example.com'],
+                              //attachmentPaths: ['/path/to/attachment.zip'],
+                              isHTML: false,
+                            );
+
+                            await FlutterEmailSender.send(email);
+
+
+                          },
+                          child: Container(
+                            child: Center(
+                                child: Text(
+                                  "Send mail to tutor",
+                                  style: TextStyle(color: Colors.white),
+                                )),
+                            height: 50.0,
+                            width: 150.0,
+                            decoration: BoxDecoration(
+                                color: Colors.deepOrangeAccent,
                                 borderRadius: BorderRadius.circular(10.0)),
                           ),
                         ),

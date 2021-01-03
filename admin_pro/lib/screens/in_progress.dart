@@ -20,12 +20,22 @@ int weekNumber(DateTime date) {
 }
 
 DateTime firstDay(DateTime d){
-  DateTime newd = DateTime.parse("${d.year}-${d.month}-${d.day} 00:00:00Z");
+
+  //DateTime n = DateTime.now();
+  String month = d.month>9?"${d.month}":"0${d.month}";
+  String day = d.day>9?"${d.day}":"0${d.day}";
+
+  DateTime newd = DateTime.parse("${d.year}-" + month +"-"+ day + " 00:00:00Z");
   return newd.subtract(new Duration(days: d.weekday));
 }
 
 DateTime  lastDay(DateTime d){
-  DateTime newd = DateTime.parse("${d.year}-${d.month}-${d.day} 00:00:00Z");
+  String month = d.month>9?"${d.month}":"0${d.month}";
+  String day = d.day>9?"${d.day}":"0${d.day}";
+
+  DateTime newd = DateTime.parse("${d.year}-" + month +"-"+ day + " 00:00:00Z");
+
+  //DateTime newd = DateTime.parse("${d.year}-${d.month}-${d.day} 00:00:00Z");
   return newd.add(new Duration(days: 7-d.weekday));
 }
 

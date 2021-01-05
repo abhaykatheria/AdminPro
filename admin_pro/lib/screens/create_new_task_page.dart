@@ -68,11 +68,13 @@ class _CreateNewTaskState extends State<CreateNewTask> {
     String _tutorid = "";
     Future<void> addAssignment(Map<String, dynamic> m) {
       String ass_id = randomString(10);
-      /*var files_dict = m['files'];
-      String file_links = "";
+      var files_dict = m['files'];
+      if(files_dict==null || files_dict.length>0){
+        String file_links = "";
       for (String file_name in files_dict.keys) {
         uploadFile(files_dict[file_name], file_name, ass_id);
-      }*/
+      }
+      }
       return assignments.add({
         'ass_id': ass_id,
         'student': m['student_name'],

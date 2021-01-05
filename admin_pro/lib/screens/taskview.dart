@@ -39,12 +39,8 @@ class _TaskViewState extends State<TaskView> {
     Map<dynamic,dynamic> tutor_email;
 
     Future<String> getEmail(String name) async{
-
       QuerySnapshot q = await tutors.where("name",isEqualTo: name).get();
-
       return q.docs[0]['email'];
-
-
     }
 
 
@@ -231,6 +227,7 @@ Future<void> updateDate(BuildContext context) async {
                         Divider(),
                         FlatButton(
                           onPressed: () async{
+
                            String name = await getEmail(
                                data['tutor']
                            );

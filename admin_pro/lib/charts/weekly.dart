@@ -10,8 +10,12 @@ int weekNumber(DateTime date) {
 
 DateTime getFirstDay(DateTime d){
 
+  String month = d.month>9?"${d.month}":"0${d.month}";
 
-  DateTime newd = DateTime.parse("${d.year}-${d.month}-${d.day} 00:00:00Z");
+  String day = d.day>9?"${d.day}":"0${d.day}";
+
+  DateTime newd = DateTime.parse("${d.year}-" + month+"-"+ day + " 00:00:00Z");
+
   // microsecond
   // millisecond
   // minute
@@ -43,6 +47,7 @@ class _WeeklyState extends State<Weekly> {
           stream:
               FirebaseFirestore.instance.collection("assignments").snapshots(),
           builder: (context, snapshot) {
+            if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
             if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
 
             m.clear();

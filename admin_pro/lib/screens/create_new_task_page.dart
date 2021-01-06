@@ -98,43 +98,9 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       }).then((value) {
         print("Assignment Added");
         print(m);
-        Iterable<Attachment> toAt(Iterable<String> attachments) =>
-      (attachments ?? []).map((a) => FileAttachment(File(a)));
 
-        final message = Message()
-          ..from = Address(username, 'Abhay Bhai')
-          ..recipients.add('abhaykatheria01@gmail.com')
-          ..subject = 'New Assignment:: 😀 :: ${DateTime.now()}'
-          ..text = 'This is the plain text.\nThis is line 2 of the text part.'
-          ..html = "<h1>Test</h1>\n<p>Hey! Here's some HTML content</p>"
-          ..attachments.addAll(toAt(m['files'].values as Iterable<String>))
-          ;
 
-        try {
-          final sendReport =  send(message, smtpServer);
-          print('Message sent: ' + sendReport.toString());
-        } on MailerException catch (e) {
-          print('Message not sent.');
-          for (var p in e.problems) {
-            print('Problem: ${p.code}: ${p.msg}');
-          }
-        }
-
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text('Assignment Added'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Continue'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-        );
-        _fbKey.currentState.reset();
+       // _fbKey.currentState.reset();
 
         tutors
             .where('name', isEqualTo: m['tutor'])
@@ -166,7 +132,20 @@ class _CreateNewTaskState extends State<CreateNewTask> {
           'status': "pending",
           'pending': m['price'] - m['amount_paid'],
           'assg_id': value.id
-        }).then((value) => null);
+        }).then((value) =>  showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('Assignment Added'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Continue'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        ));
       }).catchError((error) => showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -188,6 +167,10 @@ class _CreateNewTaskState extends State<CreateNewTask> {
               ],
             ),
           ));
+
+
+
+
     }
 
     return Scaffold(

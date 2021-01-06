@@ -71,24 +71,30 @@ Future<void> updateStatus(String s) {
     Future<List<String>> listExample(String sid) async {
       List<String> ls;
       //print('/files/$sid/');
+
       firebase_storage.ListResult result2 =
-      await firebase_storage.FirebaseStorage.instance.ref('/files/$sid').listAll();
+      await firebase_storage.FirebaseStorage.instance.ref('/files/$sid').listAll().catchError((e){});
 
-      result2.items.forEach((firebase_storage.Reference ref) async{
-        //print('Found directory: $ref');
-        //print("${ref.fullPath}");
-
-        try{
+      try{
+        result2.items.forEach((firebase_storage.Reference ref) async{
           String downloadURL = await firebase_storage.FirebaseStorage.instance
               .ref("${ref.fullPath}")
-              .getDownloadURL();
+              .getDownloadURL().then((value) async{
+            print(value);
+            if(value.isNotEmpty){
+              ls.add(value.toString());
+            }
+            return null;
+          }).catchError((e){
+            print(e);
+          });
+          // print(downloadURL);
+        });
+      }
+      catch(e){
+        
+      }
 
-            ls.add(downloadURL);
-          //print(downloadURL + "ls:size: " + "${ls.length}");
-        }catch(e){
-          print(e);
-        }
-      });
       return ls;
     }
 
@@ -269,8 +275,8 @@ Future<void> updateDate(BuildContext context) async {
                           onPressed: () async{
                            List<String> ld = await listExample(data['ass_id']);
                            //print(ld[0]);
-                           //String body = getBodyString(ld);
-                           //print(body);
+                           String body = getBodyString(ld);
+                           print(body);
                            String name = await getEmail(
                                data['tutor']
                            );

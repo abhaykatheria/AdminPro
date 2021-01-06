@@ -35,6 +35,7 @@ dependencies:
   flutter_speed_dial: ^1.2.5
   flutter_duration_picker: ^1.0.4
   flutter_email_sender: ^4.0.0
+  tabbar: ^0.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

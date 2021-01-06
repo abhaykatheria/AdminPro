@@ -6,7 +6,7 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:admin_pro/theme/decorations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 class TaskView extends StatefulWidget {
   TaskView({Key key, this.id}) : super(key: key);
   final String id;
@@ -39,12 +39,8 @@ class _TaskViewState extends State<TaskView> {
     Map<dynamic,dynamic> tutor_email;
 
     Future<String> getEmail(String name) async{
-
       QuerySnapshot q = await tutors.where("name",isEqualTo: name).get();
-
       return q.docs[0]['email'];
-
-
     }
 
 
@@ -72,6 +68,46 @@ Future<void> updateStatus(String s) {
     .catchError((error) => print("Failed to update user: $error"));
 }
 
+    Future<List<String>> listExample(String sid) async {
+      List<String> ls;
+      //print('/files/$sid/');
+      firebase_storage.ListResult result2 =
+      await firebase_storage.FirebaseStorage.instance.ref('/files/$sid').listAll();
+
+      result2.items.forEach((firebase_storage.Reference ref) async{
+        //print('Found directory: $ref');
+        //print("${ref.fullPath}");
+
+        try{
+          String downloadURL = await firebase_storage.FirebaseStorage.instance
+              .ref("${ref.fullPath}")
+              .getDownloadURL();
+
+            ls.add(downloadURL);
+          //print(downloadURL + "ls:size: " + "${ls.length}");
+        }catch(e){
+          print(e);
+        }
+      });
+      return ls;
+    }
+
+    String getBodyString(List ld){
+      String heading="You had received these files";
+      String d="";
+      try{
+        ld.forEach((element) {
+          d=d+element+"\n";
+        });
+      }
+      catch(e){
+      }
+
+      d=heading+" "+d;
+
+      print(d);
+      return d;
+    }
 
 
 Future<void> updateDate(BuildContext context) async {
@@ -231,6 +267,10 @@ Future<void> updateDate(BuildContext context) async {
                         Divider(),
                         FlatButton(
                           onPressed: () async{
+                           List<String> ld = await listExample(data['ass_id']);
+                           //print(ld[0]);
+                           //String body = getBodyString(ld);
+                           //print(body);
                            String name = await getEmail(
                                data['tutor']
                            );

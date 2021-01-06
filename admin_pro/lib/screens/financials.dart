@@ -63,7 +63,14 @@ class _FinancialState extends State<Financial> {
         child: ListTile(
           title:
               Text(doc['student'] + "   " + "\$ " + doc['pending'].toString()),
-          subtitle: Text(s),
+          subtitle: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+            Text("Due date: $s"),
+            Text(
+                "Status: ${doc['status']}"
+            )
+          ]),
         ),
       );
     }
@@ -112,7 +119,17 @@ class _FinancialState extends State<Financial> {
         child: ListTile(
           title:
               Text(doc['tutor'] + "   " + "\$ " + doc['tutor_fee'].toString()),
-          subtitle: Text(s),
+          subtitle: Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+            Text(s),
+            SizedBox(
+              width: 15,
+            ),
+            Text(
+              doc['status']
+            )
+          ]),
         ),
       );
     }
@@ -211,7 +228,6 @@ class _FinancialState extends State<Financial> {
                                   itemCount: snapshot.data.documents.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    
                                     return _buildListItem(
                                       context,
                                       snapshot.data.documents[index],
@@ -227,10 +243,10 @@ class _FinancialState extends State<Financial> {
                         ],
                       ),
                     ),
-                    VerticalDivider(
+                    /*VerticalDivider(
                       color: Colors.black,
-                    ),
-                    Expanded(
+                    ),*/
+                    /*Expanded(
                       child: Column(
                         children: [
                           Padding(
@@ -272,7 +288,7 @@ class _FinancialState extends State<Financial> {
                           )
                         ],
                       ),
-                    )
+                    )*/
                   ],
                 ),
               ),

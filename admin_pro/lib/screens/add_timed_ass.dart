@@ -62,11 +62,18 @@ class _AddTimedState extends State<AddTimed> {
     String _tutorid = "";
     Future<void> addTimed(Map<String, dynamic> m, Duration duration) {
       String timed_id = randomString(10);
-      /*var files_dict = m['files'];
-      String file_links = "";
-      for (String file_name in files_dict.keys) {
-        uploadFile(files_dict[file_name], file_name, ass_id);
-      }*/
+
+      try{
+        if( m.containsKey('files')){
+          String file_links = "";
+          for (String file_name in m['files'].keys) {
+            uploadFile(m['files'][file_name], file_name, timed_id);
+          }
+        }
+      }
+      catch(e){
+        print(e);
+      }
 
       return timed.add({
         'ass_id': timed_id,
@@ -77,8 +84,9 @@ class _AddTimedState extends State<AddTimed> {
         'amount_paid': m['amount_paid'],
         'tutor_fee': m["tutor_fee"],
         'due_date': Timestamp.fromDate(m['start_date']),
+        'start_date': Timestamp.fromDate(m['start_date']),
         'duration': duration.toString(),
-        'assigned_date': Timestamp.fromDate(DateTime.parse(m['assigned_date'])),
+        'assigned_date': Timestamp.fromDate(m['assigned_date']),
         'comments': m['comments'],
         'satus': 'ongoing',
         'payment_pending': true,
@@ -86,23 +94,8 @@ class _AddTimedState extends State<AddTimed> {
       }).then((value) {
         print("Assignment Added");
         print(m);
-        
 
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text('Timed Added'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Continue'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-        );
-        _fbKey.currentState.reset();
+       // _fbKey.currentState.reset();
 
         tutors
             .where('name', isEqualTo: m['tutor'])
@@ -122,7 +115,7 @@ class _AddTimedState extends State<AddTimed> {
         dues.add({
           'tutor': m['tutor'],
           'tutor_id': _tutorid,
-          'due_date': Timestamp.fromDate(m['due_date']),
+          'due_date': Timestamp.fromDate(m['start_date']),
           'tutor_fee': m['tutor_fee'],
           'assg_id': value.id,
           'status': "pending"
@@ -130,32 +123,25 @@ class _AddTimedState extends State<AddTimed> {
 
         payments.add({
           'student': m['student_name'],
-          'due_date': Timestamp.fromDate(m['due_date']),
+          'due_date': Timestamp.fromDate(m['start_date']),
           'status': "pending",
           'pending': m['price'] - m['amount_paid'],
           'assg_id': value.id
-        }).then((value) => null);
-      }).catchError((error) => showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-              title: Text(error.toString()),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[
-                    Text('Try Again Please'),
-                  ],
-                ),
+        }).then((value) =>  showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('Timed Added'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Continue'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('Continue'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ),
-          ));
+            ],
+          ),
+        ));
+      }).catchError((e) => print(e));
     }
     
     return Scaffold(
@@ -308,12 +294,12 @@ class _AddTimedState extends State<AddTimed> {
                             height: 15.0,
                           ),
 
-                          FormBuilderTextField(
+                          FormBuilderDateTimePicker(
                             attribute: "assigned_date",
-                            maxLines: 1,
-                            decoration: getTextDecoration(label:"Assigned Date"),
-                            initialValue: DateTime.now().toString(),
-                            readOnly: true,
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: "Assigned Date",
+                                suffixIcon: Icon(Icons.calendar_today)),
                           ),
                           SizedBox(height: 15.0),
                           FormBuilderTextField(

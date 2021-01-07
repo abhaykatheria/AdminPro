@@ -146,7 +146,6 @@ class TutorContainer extends StatelessWidget {
             ),
             Column(
               children: [
-                Text("Country : "+country),
                 Padding(child: Text("Dues : " + dues.toString()+" \$",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,

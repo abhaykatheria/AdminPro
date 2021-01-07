@@ -17,7 +17,7 @@ class _TutorsState extends State<Tutors> {
     return TutorContainer(
       name: doc['name'],
       email: doc['email'],
-      country: doc['country'],
+      country: '',
       boxColor: LightColors.kLightGreen,
       dues : doc['dues'],
       id : doc.id

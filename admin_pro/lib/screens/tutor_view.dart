@@ -110,8 +110,6 @@ Widget _buildListItem(
                               SizedBox(
                                 height: 12.0,
                               ),
-                              taskviewfield(
-                                  field: "Country", value: data['country']),
                               SizedBox(
                                 height: 12.0,
                               ),

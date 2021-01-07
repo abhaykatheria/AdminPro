@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:admin_pro/theme/colors/light_colors.dart';
 import 'package:admin_pro/widgets/data.dart';
+import 'package:admin_pro/screens/timed_container.dart';
 import 'package:expandable/expandable.dart';
 import 'package:admin_pro/widgets/task_container.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 class AllAssignments extends StatefulWidget {
   AllAssignments({Key key}) : super(key: key);
 
@@ -42,10 +43,29 @@ class _AllAssignmentsState extends State<AllAssignments> {
     );
   }
 
+  Widget _buildListItem2(
+      BuildContext context,
+      DocumentSnapshot doc,
+      ) {
+    return TimedContainer(
+      title: doc['student'],
+      subtitle: "Due " + doc['due_date'].toDate().toString(),
+      boxColor: LightColors.kPalePink,
+      price: doc['price'],
+      tutor: doc['tutor'],
+      id: doc.id,
+      // a:assignments[index]
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     CollectionReference assgs =
         FirebaseFirestore.instance.collection('assignments');
+
+    CollectionReference timed =
+    FirebaseFirestore.instance.collection('timed');
 
     return Scaffold(
       body: SafeArea(
@@ -65,29 +85,68 @@ class _AllAssignmentsState extends State<AllAssignments> {
                       ),
                     ),
                     SizedBox(height: 15.0),
-                    StreamBuilder(
-                      stream: assgs
-                          .orderBy('due_date', descending: true)
-                          .snapshots(),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        if (!snapshot.hasData) return Text("Loading.......");
-                        return ListView.separated(
-                          shrinkWrap: true,
-                          itemCount: snapshot.data.documents.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return _buildListItem(
-                              context,
-                              snapshot.data.documents[index],
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) =>
-                              const Divider(),
-                          physics: const NeverScrollableScrollPhysics(),
-                        );
-                      },
+                    ExpandablePanel(
+                      header: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Assignments",
+                        style: GoogleFonts.play(textStyle: TextStyle(fontSize: 25.0)),
+                      ),
+                    ),
+                      expanded: StreamBuilder(
+                        stream: assgs
+                            .orderBy('due_date', descending: true)
+                            .snapshots(),
+                        builder: (BuildContext context, AsyncSnapshot snapshot) {
+                          if (!snapshot.hasData) return Text("Loading.......");
+                          return ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: snapshot.data.documents.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return _buildListItem(
+                                context,
+                                snapshot.data.documents[index],
+                              );
+                            },
+                            separatorBuilder: (BuildContext context, int index) =>
+                                const Divider(),
+                            physics: const NeverScrollableScrollPhysics(),
+                          );
+                        },
+                      ),
                     ),
                     Divider(
                       color: Colors.black12,
+                    ),
+                    ExpandablePanel(
+                      header: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Timed",
+                          style: GoogleFonts.play(textStyle: TextStyle(fontSize: 25.0)),
+                        ),
+                      ),
+                      expanded: StreamBuilder(
+                        stream: timed.snapshots(),
+                        builder: (BuildContext context, AsyncSnapshot snapshot) {
+                          if (!snapshot.hasData) return Text("Loading.......");
+                          return ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: snapshot.data.documents.length,
+                            itemBuilder: (BuildContext context, int index) {
+
+                              return _buildListItem2(
+                                context,
+                                snapshot.data.documents[index],
+                              );
+                            },
+                            separatorBuilder:
+                                (BuildContext context, int index) =>
+                            const Divider(),
+                            physics: const NeverScrollableScrollPhysics(),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),

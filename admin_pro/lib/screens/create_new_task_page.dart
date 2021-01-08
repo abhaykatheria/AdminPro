@@ -156,19 +156,8 @@ class _CreateNewTaskState extends State<CreateNewTask> {
             .get()
             .then((value) => {
                   value.docs.forEach((element) {
-                    tutors
-                        .doc(element.id)
-                        .update({"dues": element['dues'] + m['tutor_fee']});
 
-                    dues.add({
-                      'tutor': m['tutor'],
-                      'tutorId': element.id,
-                      'due_date': Timestamp.fromDate(m['due_date']),
-                      'tutor_fee': m['tutor_fee'],
-                      'assg_id': ass_id,
-                      'status': "pending",
-                      'ass_type': "general"
-                    }).then((value) => print("success"));
+
                   })
                 })
             .catchError((error) {

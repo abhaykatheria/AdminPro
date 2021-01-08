@@ -65,8 +65,20 @@ Future<void> updateStatus(String s) {
   return assignments
     .doc(widget.id)
     .update({'satus': s})
-    .then((value) => print("status Updated"))
+    .then((value){
+      if(s=='completed'){
+        assignments.doc(widget.id).get().then((doc){
+          tutors.where('name',isEqualTo: doc['tutor']).get().then((value) {
+            tutors.doc(value.docs[0].id).update({
+              'dues': value.docs[0]['dues'] + doc['tutor_fee'],
+            });
+          });
+        });
+      }
+
+  })
     .catchError((error) => print("Failed to update user: $error"));
+
 }
 
     Future<List<String>> listExample(String sid) async {
@@ -226,7 +238,7 @@ Future<void> updateDate(BuildContext context) async {
                                   ),
                                   taskviewfield(
                                       field: "Tutor Fee",
-                                      value: data['price'].toString() + " \$"),
+                                      value: data['tutor_fee'].toString() + " \$"),
                                   SizedBox(
                                     height: 12.0,
                                   ),

@@ -20,9 +20,13 @@ class TaskContainer extends StatelessWidget {
   final Color boxColor;
   final int price;
   final String id;
+  final String assignedDate;
+  final String subject;
+  final int tutorFee;
   
   TaskContainer({
-    this.title, this.subtitle, this.boxColor, this.price, this.tutor, this.id
+    this.title, this.subtitle, this.boxColor, this.price, this.tutor, this.id,this.assignedDate,this.subject,
+    this.tutorFee
   });
 
 
@@ -40,7 +44,7 @@ class TaskContainer extends StatelessWidget {
           child: Container(
         margin: EdgeInsets.symmetric(vertical: 5.0),
         padding: EdgeInsets.all(20.0),
-        height:100.0,
+        height:145.0,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -54,16 +58,44 @@ class TaskContainer extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                
+
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0),
-                  child: Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 10.0,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 10.0,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Text(
+                        'Assigned: '+ assignedDate,
+                        style: TextStyle(
+                          fontSize: 10.0,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Text(
+                        'Subject: '+ subject,
+                        style: TextStyle(
+                          fontSize: 10.0,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Text('\nPrice: ' +price.toString()+" \$",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12.0
+                        ),
+                      ),
+
+                    ],
                   ),
                 )
               ],
@@ -72,10 +104,12 @@ class TaskContainer extends StatelessWidget {
             Column(
               children: [
                 Text("Tutor : "+tutor),
-                Padding(child: Text(price.toString()+" \$",
+                Padding(child:
+                Text(
+                  'Tutor Fee: '+ '$tutorFee \$',
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15.0
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12.0
                   ),
                 ),
                 padding:EdgeInsets.only(top: 10.0),),

@@ -93,7 +93,8 @@ class _InProgressState extends State<InProgress>  with SingleTickerProviderState
                     StreamBuilder(
                         stream: assgs.where('satus', isEqualTo: "ongoing").orderBy(s, descending: true).snapshots(),
                         builder: (BuildContext context, AsyncSnapshot snapshot) {
-                          if (!snapshot.hasData) return Text("Loading.......");
+                         
+                          if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
                           return ListView.separated(
                             shrinkWrap: true,
                             itemCount: snapshot.data.documents.length,

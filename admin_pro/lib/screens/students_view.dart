@@ -52,8 +52,9 @@ class _StudentsViewState extends State<StudentsView> {
             return Text("Something went wrong");
           }
           if (snapshot.connectionState != ConnectionState.done) {
-            return Text("loading");
+            if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
           }
+
           Map<String, dynamic> data = snapshot.data.data();
           print("--------------------******************");
           print(data);

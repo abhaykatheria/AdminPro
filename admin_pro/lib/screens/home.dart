@@ -81,11 +81,15 @@ class _HomeState extends State<Home> {
                               stream: students
                                   .snapshots(),
                               builder: (context, snapshot) {
+
                                 if (!snapshot.hasData)
-                                  return Text("Loading.......");
+                                  return Center(child: CircularProgressIndicator());
+
                                 List<String> students_list = _getTutorsList(context, snapshot.data);
                                 List<String> id_list = _getIdList(context, snapshot.data);
-                                return FormBuilderTypeAhead(
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: FormBuilderTypeAhead(
               decoration: getTextDecoration(label:"Student",prefix: ""),
               attribute: 'student',
               onChanged: _onChanged,
@@ -94,14 +98,14 @@ class _HomeState extends State<Home> {
                   title: Text(student),
                   onTap: () {
                     Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => StudentsView(id:id_list[students_list.indexOf(student)])));
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => StudentsView(id:id_list[students_list.indexOf(student)])));
                   },
                 );
               },
               controller: TextEditingController(text: ''),
-              
+
               suggestionsCallback: (query) {
                 if (query.isNotEmpty) {
                   var lowercaseQuery = query.toLowerCase();
@@ -117,7 +121,8 @@ class _HomeState extends State<Home> {
                   return students_list;
                 }
               },
-            );
+            ),
+                                );
                               }),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

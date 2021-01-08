@@ -14,6 +14,7 @@ class AllAssignments extends StatefulWidget {
 }
 
 class _AllAssignmentsState extends State<AllAssignments> {
+  int _value = 1;
   Text subheading(String title) {
     return Text(
       title,
@@ -31,13 +32,20 @@ class _AllAssignmentsState extends State<AllAssignments> {
   ) {
     DateTime d = doc['due_date'].toDate();
     String s = "${d.day}-${d.month}-${d.year}";
+
+    DateTime d1 = doc['assigned_date'].toDate();
+    String assignDate = "${d1.day}-${d1.month}-${d1.year}";
+
     print(doc['price']);
     return TaskContainer(
       title: doc['student'],
-      subtitle: "Due " + s + " status : " + doc['satus'],
+      subtitle: "Due: " + s + " Status : " + doc['satus'],
       boxColor: LightColors.kLightGreen,
       price: doc['price'],
       tutor: doc['tutor'],
+      assignedDate: assignDate,
+      subject: doc['subject'],
+      tutorFee: doc['tutor_fee'],
       id: doc.id,
       // a:assignments[index]
     );
@@ -57,6 +65,18 @@ class _AllAssignmentsState extends State<AllAssignments> {
       // a:assignments[index]
     );
   }
+
+  void _onDropDownChanged(int val) {
+    setState(() {
+      _value = val;
+    });
+  }
+
+  Map m={
+    1 : 'due_date',
+    2 : 'student',
+    3 :  'tutor'
+  };
 
 
   @override
@@ -84,6 +104,41 @@ class _AllAssignmentsState extends State<AllAssignments> {
                         fontSize: 30.0,
                       ),
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          'Sort by:',style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
+                        ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(20.0),
+                          child: DropdownButton(
+                              value: _value,
+                              items: [
+                                DropdownMenuItem(
+                                  child: Text("Due Date"),
+                                  value: 1,
+                                ),
+                                DropdownMenuItem(
+                                  child: Text("Student Name"),
+                                  value: 2,
+                                ),
+                                DropdownMenuItem(
+                                    child: Text("Tutor Name"),
+                                    value: 3
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _onDropDownChanged(value);
+                                });
+                              }),
+                        ),
+                      ],
+                    ),
                     SizedBox(height: 15.0),
                     ExpandablePanel(
                       header: Padding(
@@ -95,7 +150,7 @@ class _AllAssignmentsState extends State<AllAssignments> {
                     ),
                       expanded: StreamBuilder(
                         stream: assgs
-                            .orderBy('due_date', descending: true)
+                            .orderBy(m[_value], descending: true)
                             .snapshots(),
                         builder: (BuildContext context, AsyncSnapshot snapshot) {
                           if (!snapshot.hasData) return Text("Loading.......");
@@ -127,7 +182,7 @@ class _AllAssignmentsState extends State<AllAssignments> {
                         ),
                       ),
                       expanded: StreamBuilder(
-                        stream: timed.snapshots(),
+                        stream: timed.orderBy(m[_value], descending: true).snapshots(),
                         builder: (BuildContext context, AsyncSnapshot snapshot) {
                           if (!snapshot.hasData) return Text("Loading.......");
                           return ListView.separated(

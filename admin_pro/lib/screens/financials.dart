@@ -175,38 +175,41 @@ class _FinancialState extends State<Financial> {
                     return Text("Loading.......");
                   List<String> students_list = _getTutorsList(context, snapshot.data);
                   List<String> id_list = _getIdList(context, snapshot.data);
-                  return FormBuilderTypeAhead(
-                    decoration: getTextDecoration(label:"Student",prefix: ""),
-                    attribute: 'student',
-                    onChanged: _onChanged,
-                    itemBuilder: (context, student) {
-                      return ListTile(
-                        title: Text(student),
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TransactionResult(stud_name: student)));
-                        },
-                      );
-                    },
-                    controller: TextEditingController(text: ''),
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FormBuilderTypeAhead(
+                      decoration: getTextDecoration(label:"Student",prefix: ""),
+                      attribute: 'student',
+                      onChanged: _onChanged,
+                      itemBuilder: (context, student) {
+                        return ListTile(
+                          title: Text(student),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => TransactionResult(stud_name: student)));
+                          },
+                        );
+                      },
+                      controller: TextEditingController(text: ''),
 
-                    suggestionsCallback: (query) {
-                      if (query.isNotEmpty) {
-                        var lowercaseQuery = query.toLowerCase();
-                        return students_list.where((student) {
-                          return student.toLowerCase().contains(lowercaseQuery);
-                        }).toList(growable: false)
-                          ..sort((a, b) => a
-                              .toLowerCase()
-                              .indexOf(lowercaseQuery)
-                              .compareTo(
-                              b.toLowerCase().indexOf(lowercaseQuery)));
-                      } else {
-                        return students_list;
-                      }
-                    },
+                      suggestionsCallback: (query) {
+                        if (query.isNotEmpty) {
+                          var lowercaseQuery = query.toLowerCase();
+                          return students_list.where((student) {
+                            return student.toLowerCase().contains(lowercaseQuery);
+                          }).toList(growable: false)
+                            ..sort((a, b) => a
+                                .toLowerCase()
+                                .indexOf(lowercaseQuery)
+                                .compareTo(
+                                b.toLowerCase().indexOf(lowercaseQuery)));
+                        } else {
+                          return students_list;
+                        }
+                      },
+                    ),
                   );
                 }),
             Row(

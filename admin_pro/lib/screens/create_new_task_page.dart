@@ -69,15 +69,14 @@ class _CreateNewTaskState extends State<CreateNewTask> {
     Future<void> addAssignment(Map<String, dynamic> m) {
       String ass_id = randomString(10);
       //var files_dict = m['files'];
-      try{
-        if( m.containsKey('files')){
+      try {
+        if (m.containsKey('files')) {
           String file_links = "";
           for (String file_name in m['files'].keys) {
             uploadFile(m['files'][file_name], file_name, ass_id);
           }
         }
-      }
-      catch(e){
+      } catch (e) {
         print(e);
       }
 
@@ -99,53 +98,64 @@ class _CreateNewTaskState extends State<CreateNewTask> {
         print("Assignment Added");
         print(m);
 
-
-       // _fbKey.currentState.reset();
+        String ass_id = value.id;
+        // _fbKey.currentState.reset();
 
         tutors
             .where('name', isEqualTo: m['tutor'])
             .get()
             .then((value) => {
                   value.docs.forEach((element) {
-                    _tutorid = element.id;
                     tutors
                         .doc(element.id)
                         .update({"dues": element['dues'] + m['tutor_fee']});
+
+                    dues.add({
+                      'tutor': m['tutor'],
+                      'tutor_id': element.id,
+                      'due_date': Timestamp.fromDate(m['due_date']),
+                      'tutor_fee': m['tutor_fee'],
+                      'assg_id': ass_id,
+                      'status': "pending",
+                      'ass_type': "general"
+                    }).then((value) => print("success"));
                   })
                 })
             .catchError((error) {
-          print("dues not updated");
+          print(error);
         });
 
-        dues.add({
-          'tutor': m['tutor'],
-          'tutor_id': _tutorid,
-          'due_date': Timestamp.fromDate(m['due_date']),
-          'tutor_fee': m['tutor_fee'],
-          'assg_id': value.id,
-          'status': "pending"
-        }).then((value) => null);
+        // dues.add({
+        //   'tutor': m['tutor'],
+        //   'tutor_id': _tutorid,
+        //   'due_date': Timestamp.fromDate(m['due_date']),
+        //   'tutor_fee': m['tutor_fee'],
+        //   'assg_id': value.id,
+        //   'status': "pending",
+        //   'ass_type' : "general"
+        // }).then((value) => null);
 
         payments.add({
           'student': m['student_name'],
           'due_date': Timestamp.fromDate(m['due_date']),
           'status': "pending",
           'pending': m['price'] - m['amount_paid'],
-          'assg_id': value.id
-        }).then((value) =>  showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text('Assignment Added'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Continue'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+          'assg_id': value.id,
+          'ass_type': "general"
+        }).then((value) => showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                title: Text('Assignment Added'),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('Continue'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
-        ));
+            ));
       }).catchError((error) => showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -167,10 +177,6 @@ class _CreateNewTaskState extends State<CreateNewTask> {
               ],
             ),
           ));
-
-
-
-
     }
 
     return Scaffold(
@@ -188,40 +194,43 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                       padding: const EdgeInsets.all(1.0),
                       child: Column(
                         children: <Widget>[
-                         StreamBuilder<Object>(
-                              stream: students
-                                  .snapshots(),
+                          StreamBuilder<Object>(
+                              stream: students.snapshots(),
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData)
                                   return Text("Loading.......");
-                                List<String> students_list = _getTutorsList(context, snapshot.data);
+                                List<String> students_list =
+                                    _getTutorsList(context, snapshot.data);
                                 return FormBuilderTypeAhead(
-              decoration: getTextDecoration(label:"Student",prefix: ""),
-              attribute: 'student_name',
-              onChanged: _onChanged,
-              itemBuilder: (context, student) {
-                return ListTile(
-                  title: Text(student),
-                );
-              },
-              controller: TextEditingController(text: ''),
-              
-              suggestionsCallback: (query) {
-                if (query.isNotEmpty) {
-                  var lowercaseQuery = query.toLowerCase();
-                  return students_list.where((student) {
-                    return student.toLowerCase().contains(lowercaseQuery);
-                  }).toList(growable: false)
-                    ..sort((a, b) => a
-                        .toLowerCase()
-                        .indexOf(lowercaseQuery)
-                        .compareTo(
-                            b.toLowerCase().indexOf(lowercaseQuery)));
-                } else {
-                  return students_list;
-                }
-              },
-            );
+                                  decoration: getTextDecoration(
+                                      label: "Student", prefix: ""),
+                                  attribute: 'student_name',
+                                  onChanged: _onChanged,
+                                  itemBuilder: (context, student) {
+                                    return ListTile(
+                                      title: Text(student),
+                                    );
+                                  },
+                                  controller: TextEditingController(text: ''),
+                                  suggestionsCallback: (query) {
+                                    if (query.isNotEmpty) {
+                                      var lowercaseQuery = query.toLowerCase();
+                                      return students_list.where((student) {
+                                        return student
+                                            .toLowerCase()
+                                            .contains(lowercaseQuery);
+                                      }).toList(growable: false)
+                                        ..sort((a, b) => a
+                                            .toLowerCase()
+                                            .indexOf(lowercaseQuery)
+                                            .compareTo(b
+                                                .toLowerCase()
+                                                .indexOf(lowercaseQuery)));
+                                    } else {
+                                      return students_list;
+                                    }
+                                  },
+                                );
                               }),
                           SizedBox(
                             height: 15.0,
@@ -233,34 +242,38 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData)
                                   return Text("Loading.......");
-                                List<String> tutors_list = _getTutorsList(context, snapshot.data);
+                                List<String> tutors_list =
+                                    _getTutorsList(context, snapshot.data);
                                 return FormBuilderTypeAhead(
-              decoration:getTextDecoration(label:"Tutor",prefix: ""),
-              attribute: 'tutor',
-              onChanged: _onChanged,
-              itemBuilder: (context, tutor) {
-                return ListTile(
-                  title: Text(tutor),
-                );
-              },
-              controller: TextEditingController(text: ''),
-              
-              suggestionsCallback: (query) {
-                if (query.isNotEmpty) {
-                  var lowercaseQuery = query.toLowerCase();
-                  return tutors_list.where((tutor) {
-                    return tutor.toLowerCase().contains(lowercaseQuery);
-                  }).toList(growable: false)
-                    ..sort((a, b) => a
-                        .toLowerCase()
-                        .indexOf(lowercaseQuery)
-                        .compareTo(
-                            b.toLowerCase().indexOf(lowercaseQuery)));
-                } else {
-                  return tutors_list;
-                }
-              },
-            );
+                                  decoration: getTextDecoration(
+                                      label: "Tutor", prefix: ""),
+                                  attribute: 'tutor',
+                                  onChanged: _onChanged,
+                                  itemBuilder: (context, tutor) {
+                                    return ListTile(
+                                      title: Text(tutor),
+                                    );
+                                  },
+                                  controller: TextEditingController(text: ''),
+                                  suggestionsCallback: (query) {
+                                    if (query.isNotEmpty) {
+                                      var lowercaseQuery = query.toLowerCase();
+                                      return tutors_list.where((tutor) {
+                                        return tutor
+                                            .toLowerCase()
+                                            .contains(lowercaseQuery);
+                                      }).toList(growable: false)
+                                        ..sort((a, b) => a
+                                            .toLowerCase()
+                                            .indexOf(lowercaseQuery)
+                                            .compareTo(b
+                                                .toLowerCase()
+                                                .indexOf(lowercaseQuery)));
+                                    } else {
+                                      return tutors_list;
+                                    }
+                                  },
+                                );
                               }),
                           SizedBox(
                             height: 15.0,
@@ -268,7 +281,8 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           FormBuilderTextField(
                             attribute: "time_zone",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Time Zone",prefix: "UTC + "),
+                            decoration: getTextDecoration(
+                                label: "Time Zone", prefix: "UTC + "),
                           ),
                           SizedBox(
                             height: 15.0,
@@ -276,7 +290,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           FormBuilderTextField(
                             attribute: "subject",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Subject"),
+                            decoration: getTextDecoration(label: "Subject"),
                           ),
                           SizedBox(
                             height: 15.0,
@@ -284,7 +298,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           FormBuilderTextField(
                             attribute: "price",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Price"),
+                            decoration: getTextDecoration(label: "Price"),
                             valueTransformer: (value) => int.parse(value),
                           ),
                           SizedBox(
@@ -293,7 +307,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           FormBuilderTextField(
                             attribute: "amount_paid",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Amount Paid"),
+                            decoration: getTextDecoration(label: "Amount Paid"),
                             valueTransformer: (value) => int.parse(value),
                           ),
                           SizedBox(
@@ -302,7 +316,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           FormBuilderTextField(
                             attribute: "tutor_fee",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Tutor Fee"),
+                            decoration: getTextDecoration(label: "Tutor Fee"),
                             valueTransformer: (value) => int.parse(value),
                           ),
                           SizedBox(
@@ -329,14 +343,14 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                             attribute: "assigned_date",
                             maxLines: 1,
                             decoration: getTextDecoration(label:"Assigned Date"),
-                           *//* initialValue: DateTime.now().toString(),
-                            readOnly: false,*//*
+                           */ /* initialValue: DateTime.now().toString(),
+                            readOnly: false,*/ /*
                           ),*/
                           SizedBox(height: 15.0),
                           FormBuilderTextField(
                             attribute: "comments",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Comments"),
+                            decoration: getTextDecoration(label: "Comments"),
                           ),
                           SizedBox(
                             height: 15.0,

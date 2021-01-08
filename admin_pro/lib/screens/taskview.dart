@@ -37,6 +37,7 @@ class _TaskViewState extends State<TaskView> {
     FirebaseFirestore.instance.collection('tutors');
 
     Map<dynamic,dynamic> tutor_email;
+    List<String> ld;
 
     Future<String> getEmail(String name) async{
       QuerySnapshot q = await tutors.where("name",isEqualTo: name).get();
@@ -69,30 +70,27 @@ Future<void> updateStatus(String s) {
 }
 
     Future<List<String>> listExample(String sid) async {
-      List<String> ls;
-      //print('/files/$sid/');
+      List<String> ls= List<String>();
 
+      //print('/files/$sid/');
       firebase_storage.ListResult result2 =
       await firebase_storage.FirebaseStorage.instance.ref('/files/$sid').listAll().catchError((e){});
+      for (dynamic ref in result2.items){
 
-      try{
-        result2.items.forEach((firebase_storage.Reference ref) async{
-          String downloadURL = await firebase_storage.FirebaseStorage.instance
-              .ref("${ref.fullPath}")
-              .getDownloadURL().then((value) async{
-            print(value);
-            if(value.isNotEmpty){
-              ls.add(value.toString());
-            }
-            return null;
-          }).catchError((e){
-            print(e);
-          });
-          // print(downloadURL);
+        String downloadURL = await firebase_storage.FirebaseStorage.instance
+            .ref("${ref.fullPath}")
+            .getDownloadURL().then((value){
+          print(value);
+          if(value.isNotEmpty){
+            return value.toString();
+          }
+          return null;
+        }).catchError((e){
+          print(e);
         });
-      }
-      catch(e){
-        
+        ls.add(downloadURL);
+
+
       }
 
       return ls;
@@ -103,7 +101,7 @@ Future<void> updateStatus(String s) {
       String d="";
       try{
         ld.forEach((element) {
-          d=d+element+"\n";
+          d = d + element + "\n\n";
         });
       }
       catch(e){
@@ -273,24 +271,55 @@ Future<void> updateDate(BuildContext context) async {
                         Divider(),
                         FlatButton(
                           onPressed: () async{
-                           List<String> ld = await listExample(data['ass_id']);
+                            ld.clear();
+                            ld = await listExample(data['ass_id']);
                            //print(ld[0]);
-                           String body = getBodyString(ld);
-                           print(body);
-                           String name = await getEmail(
-                               data['tutor']
-                           );
-                           final Email email = Email(
-                             body: '',
-                             subject: 'Feedback/Suggestion/Bug reporting',
-                             recipients: [name],
-                             //cc: ['cc@example.com'],
-                             //bcc: ['bcc@example.com'],
-                             //attachmentPaths: ['/path/to/attachment.zip'],
-                             isHTML: false,
-                           );
 
-                           await FlutterEmailSender.send(email);
+                          },
+                          child: Container(
+                            child: Center(
+                                child: Text(
+                                  "Prepare Mail",
+                                  style: TextStyle(color: Colors.white),
+                                )),
+                            height: 50.0,
+                            width: 150.0,
+                            decoration: BoxDecoration(
+                                color: Colors.deepOrangeAccent,
+                                borderRadius: BorderRadius.circular(10.0)),
+                          ),
+                        ),
+                        Divider(),
+                        FlatButton(
+                          onPressed: () async{
+                            /*List<String> ld = await listExample(data['ass_id']);
+                            //print(ld[0]);
+                            String body = getBodyString(ld);
+                            print(body);
+                            */
+                            listExample(data['ass_id']).then((value)async {
+                              String body = getBodyString(value);
+
+                              print(body);
+                              String name = await getEmail(
+                                  data['tutor']
+                              );
+                              final Email email = Email(
+                                body: body,
+                                subject: 'Feedback/Suggestion/Bug reporting',
+                                recipients: [name],
+                                //cc: ['cc@example.com'],
+                                //bcc: ['bcc@example.com'],
+                                //attachmentPaths: ['/path/to/attachment.zip'],
+                                isHTML: false,
+                              );
+
+                              await FlutterEmailSender.send(email);
+
+
+                            });
+
+
 
 
                           },

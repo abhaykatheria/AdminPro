@@ -115,7 +115,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
     }
 
     String _tutorid = "";
-    Future<void> addAssignment(Map<String, dynamic> m) {
+    Future<void> addAssignment(Map<String, dynamic> m) async{
       String ass_id = randomString(10);
       //var files_dict = m['files'];
       try {
@@ -128,11 +128,12 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       } catch (e) {
         print(e);
       }
-
+      String email_name =await getEmail(m['tutor']);
       return assignments.add({
         'ass_id': ass_id,
         'student': m['student_name'],
         'tutor': m['tutor'],
+        'tutor_email': email_name,
         'subject': m['subject'],
         'price': m['price'],
         'amount_paid': m['amount_paid'],
@@ -161,7 +162,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
 
                     dues.add({
                       'tutor': m['tutor'],
-                      'tutor_id': element.id,
+                      'tutorId': element.id,
                       'due_date': Timestamp.fromDate(m['due_date']),
                       'tutor_fee': m['tutor_fee'],
                       'assg_id': ass_id,
@@ -205,6 +206,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                   TextButton(
                     child: Text('Send mail to tutor'),
                     onPressed: () async {
+                      print(m['ass_id']);
                       listExample(m['ass_id']).then((value) async {
                         String body = getBodyString(value);
 

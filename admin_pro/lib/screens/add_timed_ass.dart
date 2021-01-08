@@ -59,8 +59,14 @@ class _AddTimedState extends State<AddTimed> {
       }
     }
 
+    Future<String> getEmail(String name) async{
+      QuerySnapshot q = await tutors.where("name",isEqualTo: name).get();
+      return q.docs[0]['email'];
+    }
+
+
     String _tutorid = "";
-    Future<void> addTimed(Map<String, dynamic> m, Duration duration) {
+    Future<void> addTimed(Map<String, dynamic> m, Duration duration) async{
       String timed_id = randomString(10);
 
       try{
@@ -74,11 +80,12 @@ class _AddTimedState extends State<AddTimed> {
       catch(e){
         print(e);
       }
-
+      String email_name =await getEmail(m['tutor']);
       return timed.add({
         'ass_id': timed_id,
         'student': m['student_name'],
         'tutor': m['tutor'],
+        'tutor_email': email_name,
         'subject': m['subject'],
         'price': m['price'],
         'amount_paid': m['amount_paid'],
@@ -116,7 +123,7 @@ class _AddTimedState extends State<AddTimed> {
 
         dues.add({
           'tutor': m['tutor'],
-          'tutor_id': _tutorid,
+          'tutorId': _tutorid,
           'due_date': Timestamp.fromDate(m['start_date']),
           'tutor_fee': m['tutor_fee'],
           'assg_id': value.id,

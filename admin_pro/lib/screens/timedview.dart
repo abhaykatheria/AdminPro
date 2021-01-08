@@ -7,6 +7,7 @@ import 'package:admin_pro/theme/decorations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/screens/edit_timedview.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class TimedView extends StatefulWidget {
   TimedView({Key key, this.id}) : super(key: key);
@@ -73,6 +74,44 @@ class _TimedViewState extends State<TimedView> {
           .catchError((error) => print("Failed to update user: $error"));
     }
 
+    Future<List<String>> listExample(String sid) async {
+      List<String> ls= List<String>();
+
+      //print('/files/$sid/');
+      firebase_storage.ListResult result2 =
+      await firebase_storage.FirebaseStorage.instance.ref('/files/$sid').listAll().catchError((e){});
+      for (dynamic ref in result2.items){
+
+        String downloadURL = await firebase_storage.FirebaseStorage.instance
+            .ref("${ref.fullPath}")
+            .getDownloadURL().then((value){
+          print(value);
+          if(value.isNotEmpty){
+            return value.toString();
+          }
+          return null;
+        }).catchError((e){
+          print(e);
+        });
+        ls.add(downloadURL);
+      }
+      return ls;
+    }
+
+    String getBodyString(List ld){
+      String heading="You had received these files";
+      String d="";
+      try{
+        ld.forEach((element) {
+          d = d + element + "\n\n";
+        });
+      }
+      catch(e){
+      }
+      d=heading+" "+d;
+      print(d);
+      return d;
+    }
 
 
     Future<void> updateDate(BuildContext context) async {
@@ -235,22 +274,23 @@ class _TimedViewState extends State<TimedView> {
                         Divider(),
                         FlatButton(
                           onPressed: () async{
-                            String name = await getEmail(
-                                data['tutor']
-                            );
-                            final Email email = Email(
-                              body: '',
-                              subject: 'Feedback/Suggestion/Bug reporting',
-                              recipients: [name],
-                              //cc: ['cc@example.com'],
-                              //bcc: ['bcc@example.com'],
-                              //attachmentPaths: ['/path/to/attachment.zip'],
-                              isHTML: false,
-                            );
-
-                            await FlutterEmailSender.send(email);
-
-
+                            listExample(data['ass_id']).then((value)async {
+                              String body = getBodyString(value);
+                              print(body);
+                              String name = await getEmail(
+                                  data['tutor']
+                              );
+                              final Email email = Email(
+                                body: body,
+                                subject: 'Feedback/Suggestion/Bug reporting',
+                                recipients: [name],
+                                //cc: ['cc@example.com'],
+                                //bcc: ['bcc@example.com'],
+                                //attachmentPaths: ['/path/to/attachment.zip'],
+                                isHTML: false,
+                              );
+                              await FlutterEmailSender.send(email);
+                            });
                           },
                           child: Container(
                             child: Center(

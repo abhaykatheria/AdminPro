@@ -102,10 +102,12 @@ class _AddTimedState extends State<AddTimed> {
             .get()
             .then((value) => {
                   value.docs.forEach((element) {
+
                     _tutorid = element.id;
                     tutors
                         .doc(element.id)
                         .update({"dues": element['dues'] + m['tutor_fee']});
+
                   })
                 })
             .catchError((error) {
@@ -118,7 +120,8 @@ class _AddTimedState extends State<AddTimed> {
           'due_date': Timestamp.fromDate(m['start_date']),
           'tutor_fee': m['tutor_fee'],
           'assg_id': value.id,
-          'status': "pending"
+          'status': "pending",
+          'ass_type': "timed"
         }).then((value) => null);
 
         payments.add({

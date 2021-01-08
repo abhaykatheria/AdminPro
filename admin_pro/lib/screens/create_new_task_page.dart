@@ -7,7 +7,7 @@ import 'package:form_builder_file_picker/form_builder_file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/widgets/constrained_container.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 
@@ -52,6 +52,55 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       }
       return tutor_list;
     }
+    Future<String> getEmail(String name) async{
+      QuerySnapshot q = await tutors.where("name",isEqualTo: name).get();
+      return q.docs[0]['email'];
+    }
+
+    Future<List<String>> listExample(String sid) async {
+      List<String> ls= List<String>();
+
+      //print('/files/$sid/');
+      firebase_storage.ListResult result2 =
+      await firebase_storage.FirebaseStorage.instance.ref('/files/$sid').listAll().catchError((e){});
+      for (dynamic ref in result2.items){
+
+        String downloadURL = await firebase_storage.FirebaseStorage.instance
+            .ref("${ref.fullPath}")
+            .getDownloadURL().then((value){
+          print(value);
+          if(value.isNotEmpty){
+            return value.toString();
+          }
+          return null;
+        }).catchError((e){
+          print(e);
+        });
+        ls.add(downloadURL);
+
+
+      }
+
+      return ls;
+    }
+
+    String getBodyString(List ld){
+      String heading="You had received these files";
+      String d="";
+      try{
+        ld.forEach((element) {
+          d = d + element + "\n\n";
+        });
+      }
+      catch(e){
+      }
+
+      d=heading+" "+d;
+
+      print(d);
+      return d;
+    }
+
 
     Future<void> uploadFile(
         String filePath, String file_name, String ass_id) async {
@@ -153,9 +202,32 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                       Navigator.of(context).pop();
                     },
                   ),
+                  TextButton(
+                    child: Text('Send mail to tutor'),
+                    onPressed: () async {
+                      listExample(m['ass_id']).then((value) async {
+                        String body = getBodyString(value);
+
+                        print(body);
+                        String name = await getEmail(
+                            m['tutor']
+                        );
+                        final Email email = Email(
+                          body: body,
+                          subject: 'Feedback/Suggestion/Bug reporting',
+                          recipients: [name],
+                          //cc: ['cc@example.com'],
+                          //bcc: ['bcc@example.com'],
+                          //attachmentPaths: ['/path/to/attachment.zip'],
+                          isHTML: false,
+                        );
+
+                        await FlutterEmailSender.send(email);
+                      });
+                    }
+                  ),
                 ],
-              ),
-            ));
+              )));
       }).catchError((error) => showDialog(
             context: context,
             builder: (_) => AlertDialog(

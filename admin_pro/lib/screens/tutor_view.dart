@@ -59,9 +59,9 @@ Widget _buildListItem(
          if (snapshot.hasError) {
         return Text("Something went wrong");
       }
-      if (snapshot.connectionState != ConnectionState.done) {
-        return Text("loading");
-      }
+         if (snapshot.connectionState != ConnectionState.done) {
+           if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+         }
       Map<String, dynamic> data = snapshot.data.data();
       return Scaffold(
         backgroundColor: LightColors.kLightGreen,

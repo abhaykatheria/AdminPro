@@ -271,27 +271,6 @@ Future<void> updateDate(BuildContext context) async {
                         Divider(),
                         FlatButton(
                           onPressed: () async{
-                            ld.clear();
-                            ld = await listExample(data['ass_id']);
-                           //print(ld[0]);
-
-                          },
-                          child: Container(
-                            child: Center(
-                                child: Text(
-                                  "Prepare Mail",
-                                  style: TextStyle(color: Colors.white),
-                                )),
-                            height: 50.0,
-                            width: 150.0,
-                            decoration: BoxDecoration(
-                                color: Colors.deepOrangeAccent,
-                                borderRadius: BorderRadius.circular(10.0)),
-                          ),
-                        ),
-                        Divider(),
-                        FlatButton(
-                          onPressed: () async{
                             /*List<String> ld = await listExample(data['ass_id']);
                             //print(ld[0]);
                             String body = getBodyString(ld);

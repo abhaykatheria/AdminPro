@@ -62,7 +62,7 @@ class _InProgressState extends State<InProgress>  with SingleTickerProviderState
 
     print(doc['price']);
 
-    return doc['satus']=='ongoing' ? TaskContainer(
+    return  TaskContainer(
       title: doc['student'],
       subtitle: "Due: " + s + " Status : " + doc['satus'],
       boxColor: LightColors.kLightGreen,
@@ -73,8 +73,6 @@ class _InProgressState extends State<InProgress>  with SingleTickerProviderState
       tutorFee: doc['tutor_fee'],
       id: doc.id,
       // a:assignments[index]
-    ) : SizedBox(
-      height: 0,
     );
   }
 
@@ -138,7 +136,7 @@ class _InProgressState extends State<InProgress>  with SingleTickerProviderState
                 ),
                 SizedBox(height: 15.0),
                 StreamBuilder(
-                  stream: assgs.orderBy(m[_value],descending: true)
+                  stream: assgs.where('satus',isEqualTo: 'ongoing').orderBy(m[_value],descending: true)
                       .snapshots(),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (!snapshot.hasData) return Center(child: CircularProgressIndicator());

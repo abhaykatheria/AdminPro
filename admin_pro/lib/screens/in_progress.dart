@@ -47,111 +47,124 @@ class InProgress extends StatefulWidget {
 }
 
 class _InProgressState extends State<InProgress>  with SingleTickerProviderStateMixin {
-
+  int _value = 1;
 
   Widget _buildListItem(
     BuildContext context,
     DocumentSnapshot doc,
   ) {
-    print(doc['student']);
-    return TaskContainer(
+
+    DateTime d = doc['due_date'].toDate();
+    String s = "${d.day}-${d.month}-${d.year}";
+
+    DateTime d1 = doc['assigned_date'].toDate();
+    String assignDate = "${d1.day}-${d1.month}-${d1.year}";
+
+    print(doc['price']);
+
+    return doc['satus']=='ongoing' ? TaskContainer(
       title: doc['student'],
-      subtitle: "Due " + doc['due_date'].toDate().toString(),
-      boxColor: LightColors.kLightYellow2,
+      subtitle: "Due: " + s + " Status : " + doc['satus'],
+      boxColor: LightColors.kLightGreen,
       price: doc['price'],
       tutor: doc['tutor'],
+      assignedDate: assignDate,
+      subject: doc['subject'],
+      tutorFee: doc['tutor_fee'],
       id: doc.id,
       // a:assignments[index]
+    ) : SizedBox(
+      height: 0,
     );
   }
 
-  TabController _tabController;
-
-  @override
-  void initState() {
-    _tabController = TabController(length: 2, vsync: this);
-    super.initState();
+  void _onDropDownChanged(int val) {
+    setState(() {
+      _value = val;
+    });
   }
+
+  Map m={
+    1 : 'due_date',
+    2 : 'assigned_date',
+  };
 
   @override
   Widget build(BuildContext context) {
     CollectionReference assgs =
         FirebaseFirestore.instance.collection('assignments');
 
-
-    Widget getData(String s){
-
-      return Container(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Expanded(
-                              child: Column(
-                  children: <Widget>[
-                    
-                    SizedBox(height: 15.0),
-                    StreamBuilder(
-                        stream: assgs.where('satus', isEqualTo: "ongoing").orderBy(s, descending: true).snapshots(),
-                        builder: (BuildContext context, AsyncSnapshot snapshot) {
-                         
-                          if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
-                          return ListView.separated(
-                            shrinkWrap: true,
-                            itemCount: snapshot.data.documents.length,
-                            itemBuilder: (BuildContext context, int index) {
-
-                              return _buildListItem(
-                                context,
-                                snapshot.data.documents[index],
-                              );
-                            },
-                            separatorBuilder:
-                                (BuildContext context, int index) =>
-                                    const Divider(),
-                            physics: const NeverScrollableScrollPhysics(),
-                          );
-                        },
-                      ),
-                    
-                    Divider(
-                      color: Colors.black12,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-
-    }
     return Scaffold(
       appBar: AppBar(
         title: Text("In progress"),
         backgroundColor: Colors.blueGrey,
-        bottom: TabBar(
-          unselectedLabelColor: Colors.white,
-          labelColor: Colors.white,
-          tabs: [
-            Tab(
-              child: Text("sorted by due_date"),
-            ),
-            Tab(
-              child: Text("sorted by assg_date"),
-            ),
-            
-          ],
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          indicatorSize: TabBarIndicatorSize.tab,
-        ),
-        bottomOpacity: 1,
       ),
-      body: TabBarView(
-        children: [
-          getData("due_date"),
-          getData("assigned_date"),
-        ],
-        controller: _tabController,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Expanded(
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      'Sort by:',style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                    ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(20.0),
+                      child: DropdownButton(
+                          value: _value,
+                          items: [
+                            DropdownMenuItem(
+                              child: Text("Due Date"),
+                              value: 1,
+                            ),
+                            DropdownMenuItem(
+                              child: Text("Assigned Date"),
+                              value: 2,
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _onDropDownChanged(value);
+                            });
+                          }),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 15.0),
+                StreamBuilder(
+                  stream: assgs.orderBy(m[_value],descending: true)
+                      .snapshots(),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+                    return ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data.documents.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return _buildListItem(
+                          context,
+                          snapshot.data.documents[index],
+                        );
+                      },
+                      separatorBuilder:
+                          (BuildContext context, int index) =>
+                      const Divider(),
+                      physics: const NeverScrollableScrollPhysics(),
+                    );
+                  },
+                ),
+                Divider(
+                  color: Colors.black12,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -52,70 +52,87 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       }
       return tutor_list;
     }
-    Future<String> getEmail(String name) async{
-      QuerySnapshot q = await tutors.where("name",isEqualTo: name).get();
+
+    Future<String> getEmail(String name) async {
+      QuerySnapshot q = await tutors.where("name", isEqualTo: name).get();
       return q.docs[0]['email'];
     }
 
     Future<List<String>> listExample(String sid) async {
-      List<String> ls= List<String>();
+      List<String> ls = List<String>();
 
       //print('/files/$sid/');
-      firebase_storage.ListResult result2 =
-      await firebase_storage.FirebaseStorage.instance.ref('/files/$sid').listAll().catchError((e){});
-      for (dynamic ref in result2.items){
-
+      firebase_storage.ListResult result2 = await firebase_storage
+          .FirebaseStorage.instance
+          .ref('/files/$sid')
+          .listAll()
+          .catchError((e) {});
+      for (dynamic ref in result2.items) {
         String downloadURL = await firebase_storage.FirebaseStorage.instance
             .ref("${ref.fullPath}")
-            .getDownloadURL().then((value){
+            .getDownloadURL()
+            .then((value) {
           print(value);
-          if(value.isNotEmpty){
+          if (value.isNotEmpty) {
             return value.toString();
           }
           return null;
-        }).catchError((e){
+        }).catchError((e) {
           print(e);
         });
         ls.add(downloadURL);
-
-
       }
 
       return ls;
     }
 
-    String getBodyString(List ld){
-      String heading="You had received these files";
-      String d="";
-      try{
+    String getBodyString(List ld) {
+      String heading = "You had received these files";
+      String d = "";
+      try {
         ld.forEach((element) {
           d = d + element + "\n\n";
         });
-      }
-      catch(e){
-      }
+      } catch (e) {}
 
-      d=heading+" "+d;
+      d = heading + " " + d;
 
       print(d);
       return d;
     }
 
-
-    Future<void> uploadFile(
+    Future<bool> uploadFile(
         String filePath, String file_name, String ass_id) async {
       File file = File(filePath);
       try {
-        await firebase_storage.FirebaseStorage.instance
+        return firebase_storage.FirebaseStorage.instance
             .ref('files/' + ass_id + '/' + file_name)
-            .putFile(file);
+            .putFile(file)
+            .then((val) {
+          return true;
+        });
       } on FirebaseException catch (e) {
+        return false;
         // e.g, e.code == 'canceled'
       }
     }
 
+    Future<bool> uploadAllFiles(Map<String, dynamic> m, String ass_id) async {
+      try {
+        if (m.containsKey('files')) {
+          String file_links = "";
+          for (String file_name in m['files'].keys) {
+            await uploadFile(m['files'][file_name], file_name, ass_id);
+          }
+        }
+        return true;
+      } catch (e) {
+        print(e);
+      }
+    }
+
     String _tutorid = "";
-    Future<void> addAssignment(Map<String, dynamic> m) async{
+    Future<void> addAssignment(Map<String, dynamic> m) async {
       String ass_id = randomString(10);
       //var files_dict = m['files'];
       try {
@@ -128,7 +145,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       } catch (e) {
         print(e);
       }
-      String email_name =await getEmail(m['tutor']);
+      String email_name = await getEmail(m['tutor']);
       return assignments.add({
         'ass_id': ass_id,
         'student': m['student_name'],
@@ -154,12 +171,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
         tutors
             .where('name', isEqualTo: m['tutor'])
             .get()
-            .then((value) => {
-                  value.docs.forEach((element) {
-
-
-                  })
-                })
+            .then((value) => {value.docs.forEach((element) {})})
             .catchError((error) {
           print(error);
         });
@@ -182,43 +194,62 @@ class _CreateNewTaskState extends State<CreateNewTask> {
           'assg_id': value.id,
           'ass_type': "general"
         }).then((value) => showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                title: Text('Assignment Added'),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text('Continue'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
+            context: context,
+            builder: (_) => AlertDialog(
+                  content: FutureBuilder<bool>(
+                    future: uploadAllFiles(m, ass_id),
+                    builder: (context, val) {
+                      print(val);
+                      if (val.data == true) {
+                        return Text('File uploaded');
+                      } else {
+                        return Container(
+                          height: 50,
+                          width: 50,
+                          child: Column(
+                            children: [
+                              //Text('File are being uploaded'),
+                              SizedBox(
+                                  height:20,
+                                  child: CircularProgressIndicator())
+                            ],
+                          ),
+                        );
+                      }
                     },
                   ),
-                  TextButton(
-                    child: Text('Send mail to tutor'),
-                    onPressed: () async {
-                      print(m['ass_id']);
-                      listExample(m['ass_id']).then((value) async {
-                        String body = getBodyString(value);
+                  title: Text('Assignment Added'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('Continue'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                        child: Text('Send mail to tutor'),
+                        onPressed: () {
+                          listExample(ass_id).then((value) async {
+                            String body = getBodyString(value);
 
-                        print(body);
-                        String name = await getEmail(
-                            m['tutor']
-                        );
-                        final Email email = Email(
-                          body: body,
-                          subject: 'Feedback/Suggestion/Bug reporting',
-                          recipients: [name],
-                          //cc: ['cc@example.com'],
-                          //bcc: ['bcc@example.com'],
-                          //attachmentPaths: ['/path/to/attachment.zip'],
-                          isHTML: false,
-                        );
+                            print(body);
+                            String name = await getEmail(m['tutor']);
+                            //print('gg ${m['tutor']}');
+                            final Email email = Email(
+                              body: body,
+                              subject: 'Feedback/Suggestion/Bug reporting',
+                              recipients: [name],
+                              //cc: ['cc@example.com'],
+                              //bcc: ['bcc@example.com'],
+                              //attachmentPaths: ['/path/to/attachment.zip'],
+                              isHTML: false,
+                            );
 
-                        await FlutterEmailSender.send(email);
-                      });
-                    }
-                  ),
-                ],
-              )));
+                            await FlutterEmailSender.send(email);
+                          });
+                        }),
+                  ],
+                )));
       }).catchError((error) => showDialog(
             context: context,
             builder: (_) => AlertDialog(

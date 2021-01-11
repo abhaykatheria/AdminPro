@@ -93,8 +93,8 @@ class _AddTimedState extends State<AddTimed> {
       return ls;
     }
 
-    String getBodyString(List ld) {
-      String heading = "You had received these files";
+    String getBodyString(List ld,Map<String,dynamic> m ) {
+      String heading = "You have received a new assignment for \n student ${m['student']} subject ${m['subject']} \n The due date is ${m['due_date'].toString()} \n and the files can be find in the link below \n";
       String d = "";
       try {
         ld.forEach((element) {
@@ -227,7 +227,7 @@ class _AddTimedState extends State<AddTimed> {
                   child: Text('Send mail to tutor'),
                   onPressed: () {
                     listExample(ass_id).then((value) async {
-                      String body = getBodyString(value);
+                      String body = getBodyString(value,m);
 
                       print(body);
                       String name = await getEmail(m['tutor']);

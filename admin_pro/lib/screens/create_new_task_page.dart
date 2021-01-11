@@ -95,9 +95,16 @@ class _CreateNewTaskState extends State<CreateNewTask> {
 
       return ls;
     }
+    String formatDate(Timestamp t){
+      DateTime d = t.toDate();
+      String formattedDate =
+          "${d.day}/${d.month}/${d.year}";
+      return formattedDate;
+    }
+    String getBodyString(List ld,Map<String, dynamic> m) {
+      String heading =
+          "You have received a new assignment for \n student: ${m['student_name']} \n subject: ${m['subject']} \n The due date is ${formatDate(Timestamp.fromDate(m['due_date']))} \n and the files can be find in the links below \n\n";
 
-    String getBodyString(List ld) {
-      String heading = "You had received these files";
       String d = "";
       try {
         ld.forEach((element) {
@@ -243,7 +250,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                         child: Text('Send mail to tutor'),
                         onPressed: () {
                           listExample(ass_id).then((value) async {
-                            String body = getBodyString(value);
+                            String body = getBodyString(value,m);
 
                             print(body);
                             String name = await getEmail(m['tutor']);

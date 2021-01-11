@@ -23,8 +23,7 @@ class _AddTimedState extends State<AddTimed> {
   Duration _duration = Duration(hours: 0, minutes: 0);
   @override
   Widget build(BuildContext context) {
-    CollectionReference timed =
-        FirebaseFirestore.instance.collection('timed');
+    CollectionReference timed = FirebaseFirestore.instance.collection('timed');
 
     CollectionReference tutors =
         FirebaseFirestore.instance.collection('tutors');
@@ -33,12 +32,12 @@ class _AddTimedState extends State<AddTimed> {
 
     CollectionReference payments =
         FirebaseFirestore.instance.collection('payment_collection');
-    
+
     firebase_storage.FirebaseStorage storage =
         firebase_storage.FirebaseStorage.instance;
 
     CollectionReference students =
-    FirebaseFirestore.instance.collection('students');
+        FirebaseFirestore.instance.collection('students');
 
     List<String> _getTutorsList(BuildContext context, QuerySnapshot docs) {
       List<String> tutor_list = List();
@@ -60,8 +59,8 @@ class _AddTimedState extends State<AddTimed> {
       }
     }
 
-    Future<String> getEmail(String name) async{
-      QuerySnapshot q = await tutors.where("name",isEqualTo: name).get();
+    Future<String> getEmail(String name) async {
+      QuerySnapshot q = await tutors.where("name", isEqualTo: name).get();
       return q.docs[0]['email'];
     }
 
@@ -92,9 +91,16 @@ class _AddTimedState extends State<AddTimed> {
 
       return ls;
     }
+    String formatDate(Timestamp t){
+      DateTime d = t.toDate();
+      String formattedDate =
+          "${d.day}/${d.month}/${d.year}";
+      return formattedDate;
+    }
 
-    String getBodyString(List ld,Map<String,dynamic> m ) {
-      String heading = "You have received a new assignment for \n student ${m['student']} subject ${m['subject']} \n The due date is ${m['due_date'].toString()} \n and the files can be find in the link below \n";
+    String getBodyString(List ld, Map<String, dynamic> m) {
+      String heading =
+          "You have received a new assignment for \n student: ${m['student_name']} \n subject: ${m['subject']} \n The due date is ${formatDate(Timestamp.fromDate(m['start_date']))} \n and the files can be find in the links below \n\n";
       String d = "";
       try {
         ld.forEach((element) {
@@ -123,21 +129,20 @@ class _AddTimedState extends State<AddTimed> {
     }
 
     String _tutorid = "";
-    Future<void> addTimed(Map<String, dynamic> m, Duration duration) async{
+    Future<void> addTimed(Map<String, dynamic> m, Duration duration) async {
       String timed_id = randomString(10);
 
-      try{
-        if( m.containsKey('files')){
+      try {
+        if (m.containsKey('files')) {
           String file_links = "";
           for (String file_name in m['files'].keys) {
             uploadFile(m['files'][file_name], file_name, timed_id);
           }
         }
-      }
-      catch(e){
+      } catch (e) {
         print(e);
       }
-      String email_name =await getEmail(m['tutor']);
+      String email_name = await getEmail(m['tutor']);
       return timed.add({
         'ass_id': timed_id,
         'student': m['student_name'],
@@ -154,19 +159,17 @@ class _AddTimedState extends State<AddTimed> {
         'comments': m['comments'],
         'satus': 'ongoing',
         'payment_pending': true,
-        
       }).then((value) {
         print("Assignment Added");
         print(m);
 
-       // _fbKey.currentState.reset();
+        // _fbKey.currentState.reset();
         String ass_id = value.id;
         tutors
             .where('name', isEqualTo: m['tutor'])
             .get()
             .then((value) => {
                   value.docs.forEach((element) {
-
                     _tutorid = element.id;
                   })
                 })
@@ -190,67 +193,66 @@ class _AddTimedState extends State<AddTimed> {
           'status': "pending",
           'pending': m['price'] - m['amount_paid'],
           'assg_id': value.id
-        }).then((value) =>  showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            content: FutureBuilder<bool>(
-              future: uploadAllFiles(m, ass_id),
-              builder: (context, val) {
-                print(val);
-                if (val.data == true) {
-                  return Text('File uploaded');
-                } else {
-                  return Container(
-                    height: 50,
-                    width: 50,
-                    child: Column(
-                      children: [
-                        //Text('File are being uploaded'),
-                        SizedBox(
-                            height:20,
-                            child: CircularProgressIndicator())
-                      ],
-                    ),
-                  );
-                }
-              },
-            ),
-            title: Text('Assignment Added'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Continue'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                  child: Text('Send mail to tutor'),
-                  onPressed: () {
-                    listExample(ass_id).then((value) async {
-                      String body = getBodyString(value,m);
-
-                      print(body);
-                      String name = await getEmail(m['tutor']);
-                      //print('gg ${m['tutor']}');
-                      final Email email = Email(
-                        body: body,
-                        subject: 'Feedback/Suggestion/Bug reporting',
-                        recipients: [name],
-                        //cc: ['cc@example.com'],
-                        //bcc: ['bcc@example.com'],
-                        //attachmentPaths: ['/path/to/attachment.zip'],
-                        isHTML: false,
+        }).then((value) => showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                content: FutureBuilder<bool>(
+                  future: uploadAllFiles(m, ass_id),
+                  builder: (context, val) {
+                    print(val);
+                    if (val.data == true) {
+                      return Text('File uploaded');
+                    } else {
+                      return Container(
+                        height: 50,
+                        width: 50,
+                        child: Column(
+                          children: [
+                            //Text('File are being uploaded'),
+                            SizedBox(
+                                height: 20, child: CircularProgressIndicator())
+                          ],
+                        ),
                       );
+                    }
+                  },
+                ),
+                title: Text('Assignment Added'),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('Continue'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                      child: Text('Send mail to tutor'),
+                      onPressed: () {
+                        listExample(ass_id).then((value) async {
+                          String body = getBodyString(value, m);
 
-                      await FlutterEmailSender.send(email);
-                    });
-                  }),
-            ],
-          ),
-        ));
+                          print(body);
+                          String name = await getEmail(m['tutor']);
+                          //print('gg ${m['tutor']}');
+                          final Email email = Email(
+                            body: body,
+                            subject: 'Feedback/Suggestion/Bug reporting',
+                            recipients: [name],
+                            //cc: ['cc@example.com'],
+                            //bcc: ['bcc@example.com'],
+                            //attachmentPaths: ['/path/to/attachment.zip'],
+                            isHTML: false,
+                          );
+
+                          await FlutterEmailSender.send(email);
+                        });
+                      }),
+                ],
+              ),
+            ));
       }).catchError((e) => print(e));
     }
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Add Timed"),
@@ -267,14 +269,15 @@ class _AddTimedState extends State<AddTimed> {
                       child: Column(
                         children: <Widget>[
                           StreamBuilder<Object>(
-                              stream: students
-                                  .snapshots(),
+                              stream: students.snapshots(),
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData)
                                   return Text("Loading.......");
-                                List<String> students_list = _getTutorsList(context, snapshot.data);
+                                List<String> students_list =
+                                    _getTutorsList(context, snapshot.data);
                                 return FormBuilderTypeAhead(
-                                  decoration: getTextDecoration(label:"Student",prefix: ""),
+                                  decoration: getTextDecoration(
+                                      label: "Student", prefix: ""),
                                   attribute: 'student_name',
                                   onChanged: _onChanged,
                                   itemBuilder: (context, student) {
@@ -283,18 +286,20 @@ class _AddTimedState extends State<AddTimed> {
                                     );
                                   },
                                   controller: TextEditingController(text: ''),
-
                                   suggestionsCallback: (query) {
                                     if (query.isNotEmpty) {
                                       var lowercaseQuery = query.toLowerCase();
                                       return students_list.where((student) {
-                                        return student.toLowerCase().contains(lowercaseQuery);
+                                        return student
+                                            .toLowerCase()
+                                            .contains(lowercaseQuery);
                                       }).toList(growable: false)
                                         ..sort((a, b) => a
                                             .toLowerCase()
                                             .indexOf(lowercaseQuery)
-                                            .compareTo(
-                                            b.toLowerCase().indexOf(lowercaseQuery)));
+                                            .compareTo(b
+                                                .toLowerCase()
+                                                .indexOf(lowercaseQuery)));
                                     } else {
                                       return students_list;
                                     }
@@ -313,7 +318,7 @@ class _AddTimedState extends State<AddTimed> {
                                   return Text("Loading.......");
                                 return FormBuilderDropdown(
                                   attribute: 'tutor',
-                                  decoration: getTextDecoration(label:'Tutor'),
+                                  decoration: getTextDecoration(label: 'Tutor'),
                                   items: _getTutorsList(context, snapshot.data)
                                       .map((gender) => DropdownMenuItem(
                                           value: gender,
@@ -321,17 +326,14 @@ class _AddTimedState extends State<AddTimed> {
                                       .toList(),
                                 );
                               }),
-                         
                           SizedBox(
                             height: 15.0,
                           ),
                           FormBuilderTextField(
                             attribute: "subject",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Subject"),
-                            validators: [
-                              FormBuilderValidators.maxLength(12)
-                            ],
+                            decoration: getTextDecoration(label: "Subject"),
+                            validators: [FormBuilderValidators.maxLength(12)],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -339,11 +341,9 @@ class _AddTimedState extends State<AddTimed> {
                           FormBuilderTextField(
                             attribute: "price",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Price"),
+                            decoration: getTextDecoration(label: "Price"),
                             valueTransformer: (value) => int.parse(value),
-                            validators: [
-                              FormBuilderValidators.numeric()
-                            ],
+                            validators: [FormBuilderValidators.numeric()],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -351,11 +351,9 @@ class _AddTimedState extends State<AddTimed> {
                           FormBuilderTextField(
                             attribute: "amount_paid",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Amount Paid"),
+                            decoration: getTextDecoration(label: "Amount Paid"),
                             valueTransformer: (value) => int.parse(value),
-                            validators: [
-                              FormBuilderValidators.numeric()
-                            ],
+                            validators: [FormBuilderValidators.numeric()],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -363,7 +361,7 @@ class _AddTimedState extends State<AddTimed> {
                           FormBuilderTextField(
                             attribute: "tutor_fee",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Tutor Fee"),
+                            decoration: getTextDecoration(label: "Tutor Fee"),
                             valueTransformer: (value) => int.parse(value),
                           ),
                           SizedBox(
@@ -381,16 +379,15 @@ class _AddTimedState extends State<AddTimed> {
                           ),
                           Text("Duration"),
                           DurationPicker(
-              duration: _duration,
-              onChange: (val) {
-                this.setState(() => _duration = val);
-              },
-              snapToMins: 5.0,
-            ),
+                            duration: _duration,
+                            onChange: (val) {
+                              this.setState(() => _duration = val);
+                            },
+                            snapToMins: 5.0,
+                          ),
                           SizedBox(
                             height: 15.0,
                           ),
-
                           FormBuilderDateTimePicker(
                             attribute: "assigned_date",
                             decoration: InputDecoration(
@@ -402,10 +399,8 @@ class _AddTimedState extends State<AddTimed> {
                           FormBuilderTextField(
                             attribute: "comments",
                             maxLines: 1,
-                            decoration: getTextDecoration(label:"Comments"),
-                            validators: [
-                              FormBuilderValidators.maxLength(30)
-                            ],
+                            decoration: getTextDecoration(label: "Comments"),
+                            validators: [FormBuilderValidators.maxLength(30)],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -458,8 +453,8 @@ class _AddTimedState extends State<AddTimed> {
                                         print(_fbKey.currentState.value);
                                         print(_fbKey
                                             .currentState.value.runtimeType);
-                                        addTimed(
-                                            _fbKey.currentState.value,_duration);
+                                        addTimed(_fbKey.currentState.value,
+                                            _duration);
                                       }
                                     },
                                     child: Container(

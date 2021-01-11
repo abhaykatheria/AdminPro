@@ -139,8 +139,10 @@ Future<void> updateStatus(String s,DocumentSnapshot m) {
       return ls;
     }
 
-    String getBodyString(List ld){
-      String heading="You had received these files";
+    String getBodyString(List ld,Map<String, dynamic> m){
+      String heading =
+          "You have received a new assignment for \n student: ${m['student']} \n subject: ${m['subject']} \n The due date is ${formatDate(m['due_date'])} \n and the files can be find in the links below \n\n";
+
       String d="";
       try{
         ld.forEach((element) {
@@ -320,7 +322,7 @@ Future<void> updateDate(BuildContext context) async {
                             print(body);
                             */
                             listExample(data['ass_id']).then((value)async {
-                              String body = getBodyString(value);
+                              String body = getBodyString(value,data);
 
                               print(body);
                               String name = await getEmail(

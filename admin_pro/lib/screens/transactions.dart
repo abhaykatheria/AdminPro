@@ -133,7 +133,6 @@ class _transactionsState extends State<transactions> {
         builder: (context, snapshot) {
           int ass_price = snapshot.data.data()['price'];
           return FlatButton(
-            
             child: ListTile(
               title:
                   Text(doc['student'] + "   " + "\$ " + ass_price.toString()),

@@ -8,6 +8,7 @@ import 'package:form_builder_file_picker/form_builder_file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/widgets/constrained_container.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 
 class AddTimed extends StatefulWidget {
   AddTimed({Key key}) : super(key: key);
@@ -64,6 +65,62 @@ class _AddTimedState extends State<AddTimed> {
       return q.docs[0]['email'];
     }
 
+    Future<List<String>> listExample(String sid) async {
+      List<String> ls = List<String>();
+
+      //print('/files/$sid/');
+      firebase_storage.ListResult result2 = await firebase_storage
+          .FirebaseStorage.instance
+          .ref('/files/$sid')
+          .listAll()
+          .catchError((e) {});
+      for (dynamic ref in result2.items) {
+        String downloadURL = await firebase_storage.FirebaseStorage.instance
+            .ref("${ref.fullPath}")
+            .getDownloadURL()
+            .then((value) {
+          print(value);
+          if (value.isNotEmpty) {
+            return value.toString();
+          }
+          return null;
+        }).catchError((e) {
+          print(e);
+        });
+        ls.add(downloadURL);
+      }
+
+      return ls;
+    }
+
+    String getBodyString(List ld) {
+      String heading = "You had received these files";
+      String d = "";
+      try {
+        ld.forEach((element) {
+          d = d + element + "\n\n";
+        });
+      } catch (e) {}
+
+      d = heading + " " + d;
+
+      print(d);
+      return d;
+    }
+
+    Future<bool> uploadAllFiles(Map<String, dynamic> m, String ass_id) async {
+      try {
+        if (m.containsKey('files')) {
+          String file_links = "";
+          for (String file_name in m['files'].keys) {
+            await uploadFile(m['files'][file_name], file_name, ass_id);
+          }
+        }
+        return true;
+      } catch (e) {
+        print(e);
+      }
+    }
 
     String _tutorid = "";
     Future<void> addTimed(Map<String, dynamic> m, Duration duration) async{
@@ -103,7 +160,7 @@ class _AddTimedState extends State<AddTimed> {
         print(m);
 
        // _fbKey.currentState.reset();
-
+        String ass_id = value.id;
         tutors
             .where('name', isEqualTo: m['tutor'])
             .get()
@@ -136,7 +193,29 @@ class _AddTimedState extends State<AddTimed> {
         }).then((value) =>  showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: Text('Timed Added'),
+            content: FutureBuilder<bool>(
+              future: uploadAllFiles(m, ass_id),
+              builder: (context, val) {
+                print(val);
+                if (val.data == true) {
+                  return Text('File uploaded');
+                } else {
+                  return Container(
+                    height: 50,
+                    width: 50,
+                    child: Column(
+                      children: [
+                        //Text('File are being uploaded'),
+                        SizedBox(
+                            height:20,
+                            child: CircularProgressIndicator())
+                      ],
+                    ),
+                  );
+                }
+              },
+            ),
+            title: Text('Assignment Added'),
             actions: <Widget>[
               TextButton(
                 child: Text('Continue'),
@@ -144,6 +223,28 @@ class _AddTimedState extends State<AddTimed> {
                   Navigator.of(context).pop();
                 },
               ),
+              TextButton(
+                  child: Text('Send mail to tutor'),
+                  onPressed: () {
+                    listExample(ass_id).then((value) async {
+                      String body = getBodyString(value);
+
+                      print(body);
+                      String name = await getEmail(m['tutor']);
+                      //print('gg ${m['tutor']}');
+                      final Email email = Email(
+                        body: body,
+                        subject: 'Feedback/Suggestion/Bug reporting',
+                        recipients: [name],
+                        //cc: ['cc@example.com'],
+                        //bcc: ['bcc@example.com'],
+                        //attachmentPaths: ['/path/to/attachment.zip'],
+                        isHTML: false,
+                      );
+
+                      await FlutterEmailSender.send(email);
+                    });
+                  }),
             ],
           ),
         ));

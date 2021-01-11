@@ -55,12 +55,24 @@ class _AllAssignmentsState extends State<AllAssignments> {
       BuildContext context,
       DocumentSnapshot doc,
       ) {
+
+    DateTime d = doc['due_date'].toDate();
+    String s = "${d.day}-${d.month}-${d.year}";
+
+    DateTime d1 = doc['assigned_date'].toDate();
+    String assignDate = "${d1.day}-${d1.month}-${d1.year}";
+
+
+
     return TimedContainer(
       title: doc['student'],
-      subtitle: "Due " + doc['due_date'].toDate().toString(),
+      subtitle: "Due " + s,
       boxColor: LightColors.kPalePink,
       price: doc['price'],
       tutor: doc['tutor'],
+      assignedDate: assignDate,
+      subject: doc['subject'],
+      tutorFee: doc['tutor_fee'],
       id: doc.id,
       // a:assignments[index]
     );

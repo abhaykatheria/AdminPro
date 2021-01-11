@@ -246,7 +246,7 @@ class StudentsContainer extends StatelessWidget {
 
             Column(
               children: [
-                Text("Time Zone : "+time_zone),
+                Text(""),
                 Padding(child: Text("Dues : " + dues.toString()+" \$",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,

@@ -14,7 +14,7 @@ import 'package:mailer/smtp_server.dart';
 final String username = 'abhay.katheria1998@gmail.com';
 final String password = 'Kanpur@123';
 
-final smtpServer = gmail(username, password);
+
 
 class CreateNewTask extends StatefulWidget {
   CreateNewTask({Key key}) : super(key: key);
@@ -35,8 +35,6 @@ class _CreateNewTaskState extends State<CreateNewTask> {
     CollectionReference tutors =
         FirebaseFirestore.instance.collection('tutors');
 
-    CollectionReference dues = FirebaseFirestore.instance.collection('dues');
-
     CollectionReference payments =
         FirebaseFirestore.instance.collection('payment_collection');
     CollectionReference students =
@@ -44,6 +42,14 @@ class _CreateNewTaskState extends State<CreateNewTask> {
 
     firebase_storage.FirebaseStorage storage =
         firebase_storage.FirebaseStorage.instance;
+
+    List<String> _getIdList(BuildContext context, QuerySnapshot docs) {
+      List<String> tutor_list = List();
+      for (DocumentSnapshot doc in docs.docs) {
+        tutor_list.add(doc.id);
+      }
+      return tutor_list;
+    }
 
     List<String> _getTutorsList(BuildContext context, QuerySnapshot docs) {
       List<String> tutor_list = List();
@@ -56,6 +62,10 @@ class _CreateNewTaskState extends State<CreateNewTask> {
     Future<String> getEmail(String name) async {
       QuerySnapshot q = await tutors.where("name", isEqualTo: name).get();
       return q.docs[0]['email'];
+    }
+    Future<String> getStudentId(String name) async {
+      QuerySnapshot q = await students.where("name", isEqualTo: name).get();
+      return q.docs[0].id;
     }
 
     Future<List<String>> listExample(String sid) async {
@@ -145,6 +155,8 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       } catch (e) {
         print(e);
       }
+      String studentId = await getStudentId(m['student']);
+      print(studentId);
       String email_name = await getEmail(m['tutor']);
       return assignments.add({
         'ass_id': ass_id,
@@ -160,7 +172,8 @@ class _CreateNewTaskState extends State<CreateNewTask> {
         'comments': m['comments'],
         'satus': 'ongoing',
         'payment_pending': true,
-        'time_zone': m['time_zone']
+        'studentId' : studentId
+        
       }).then((value) {
         print("Assignment Added");
         print(m);
@@ -295,6 +308,8 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                   return Text("Loading.......");
                                 List<String> students_list =
                                     _getTutorsList(context, snapshot.data);
+                                List<String> id_list =
+                                    _getIdList(context, snapshot.data);
                                 return FormBuilderTypeAhead(
                                   decoration: getTextDecoration(
                                       label: "Student", prefix: ""),
@@ -310,6 +325,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                     if (query.isNotEmpty) {
                                       var lowercaseQuery = query.toLowerCase();
                                       return students_list.where((student) {
+                                        // _fbKey.currentState.value['student_id'] = id_list[students_list.indexOf(student)];
                                         return student
                                             .toLowerCase()
                                             .contains(lowercaseQuery);
@@ -338,6 +354,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                                   return Text("Loading.......");
                                 List<String> tutors_list =
                                     _getTutorsList(context, snapshot.data);
+                                
                                 return FormBuilderTypeAhead(
                                   decoration: getTextDecoration(
                                       label: "Tutor", prefix: ""),
@@ -372,15 +389,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                           SizedBox(
                             height: 15.0,
                           ),
-                          FormBuilderTextField(
-                            attribute: "time_zone",
-                            maxLines: 1,
-                            decoration: getTextDecoration(
-                                label: "Time Zone", prefix: "UTC + "),
-                          ),
-                          SizedBox(
-                            height: 15.0,
-                          ),
+                          
                           FormBuilderTextField(
                             attribute: "subject",
                             maxLines: 1,

@@ -32,9 +32,11 @@ class _TaskViewState extends State<TaskView> {
   Widget build(BuildContext context) {
     CollectionReference assignments =
         FirebaseFirestore.instance.collection('assignments');
-
+CollectionReference dues = FirebaseFirestore.instance.collection('dues');
     CollectionReference tutors =
     FirebaseFirestore.instance.collection('tutors');
+CollectionReference students =
+        FirebaseFirestore.instance.collection('students');
 
     Map<dynamic,dynamic> tutor_email;
     List<String> ld;
@@ -60,26 +62,55 @@ class _TaskViewState extends State<TaskView> {
     .then((value) => print("assignment Deleted"))
     .catchError((error) => print("Failed to delete user: $error"));
 }
+Future<String> getStudentId(String name) async {
+      QuerySnapshot q = await students.where("name", isEqualTo: name).get();
+      return q.docs[0].id;
+    }
+Future<void> updateStatus(String s,DocumentSnapshot m) {
+  print(m);
+      return assignments
+          .doc(widget.id)
+          .update({'satus': s})
+          .then((value){
+        if(s=='completed' && m['satus']!='completed'){
 
-Future<void> updateStatus(String s) {
-  return assignments
-    .doc(widget.id)
-    .update({'satus': s})
-    .then((value){
-      if(s=='completed'){
-        assignments.doc(widget.id).get().then((doc){
-          tutors.where('name',isEqualTo: doc['tutor']).get().then((value) {
-            tutors.doc(value.docs[0].id).update({
-              'dues': value.docs[0]['dues'] + doc['tutor_fee'],
+          print(widget.id);
+
+          assignments.doc(widget.id).get().then((doc){
+            tutors.where('name',isEqualTo: doc['tutor']).get().then((value) {
+              tutors.doc(value.docs[0].id).update({
+                'dues': value.docs[0]['dues'] + doc['tutor_fee'],
+              }).then((b) async {
+                  print(m.data());
+                  print("sabbbbb bdhiyaaa hai bosssss");
+                  String studentId = await getStudentId(doc['student']);
+                  dues.add({
+
+                    
+          'tutor': m['tutor'],
+          'tutorId': value.docs[0].id,
+          'due_date': m['due_date'],
+          'tutor_fee': m['tutor_fee'],
+          'assg_id': widget.id,
+          'status': "pending",
+          'ass_type': "general",
+          'studentId' : studentId,
+          'subject' : m['subject']
+        }).then((value) => print("dues adddddddddddeddddd" + studentId));
+
+              });
+              
+
             });
           });
-        });
+        }
+
       }
+      
+      )
+          .catchError((error) => print("Failed to update user: $error"));
 
-  })
-    .catchError((error) => print("Failed to update user: $error"));
-
-}
+    }
 
     Future<List<String>> listExample(String sid) async {
       List<String> ls= List<String>();
@@ -333,7 +364,7 @@ Future<void> updateDate(BuildContext context) async {
                           children: [
                             FlatButton(
                               onPressed: () {
-                                  updateStatus('completed').whenComplete(() =>  Navigator.of(context).pop());
+                                  updateStatus('completed',snapshot.data).whenComplete(() =>  Navigator.of(context).pop());
                               },
                               child: Container(
                                 child: Center(
@@ -350,7 +381,7 @@ Future<void> updateDate(BuildContext context) async {
                             ),
                             FlatButton(
                               onPressed: () {
-                                updateStatus('incomplete').whenComplete(() => Navigator.of(context).pop());
+                                updateStatus('incomplete',snapshot.data).whenComplete(() => Navigator.of(context).pop());
                                 //deleteAssignment() ;
                               },
                               child: Container(

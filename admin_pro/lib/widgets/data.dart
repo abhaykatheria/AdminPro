@@ -56,14 +56,6 @@ class Assignment {
   }
 }
 
-List<Assignment> assignments = <Assignment>[
-  Assignment("abhay", "science", "kamas", 80, 50, 1, ['abcd', 'efg']),
-  Assignment("abhay", "science", "kamas", 80, 50, 1, ['abcd', 'efg']),
-  Assignment("abhay", "science", "kamas", 80, 50, 1, ['abcd', 'efg']),
-  Assignment("abhay", "science", "kamas", 80, 50, 1, ['abcd', 'efg']),
-  Assignment("abhay", "science", "kamas", 80, 50, 1, ['abcd', 'efg']),
-];
-
 const contacts = <Tutor>[
   Tutor(
     'Andrew',

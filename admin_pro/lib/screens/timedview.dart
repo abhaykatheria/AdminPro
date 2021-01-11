@@ -1,6 +1,6 @@
 import 'package:admin_pro/screens/edit_taskview.dart';
 import 'package:flutter/material.dart';
-import 'package:admin_pro/widgets/data.dart';
+
 import 'package:admin_pro/theme/colors/light_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:admin_pro/theme/decorations.dart';
@@ -34,10 +34,11 @@ class _TimedViewState extends State<TimedView> {
   Widget build(BuildContext context) {
     CollectionReference timed =
     FirebaseFirestore.instance.collection('timed');
-
+CollectionReference dues = FirebaseFirestore.instance.collection('dues');
     CollectionReference tutors =
     FirebaseFirestore.instance.collection('tutors');
-
+CollectionReference students =
+        FirebaseFirestore.instance.collection('students');
     Map<dynamic,dynamic> tutor_email;
 
     Future<String> getEmail(String name) async{
@@ -57,7 +58,10 @@ class _TimedViewState extends State<TimedView> {
       return formattedDate;
     }
 
-
+Future<String> getStudentId(String name) async {
+      QuerySnapshot q = await students.where("name", isEqualTo: name).get();
+      return q.docs[0].id;
+    }
     Future<void> deleteAssignment() {
       return timed
           .doc(widget.id)
@@ -66,23 +70,48 @@ class _TimedViewState extends State<TimedView> {
           .catchError((error) => print("Failed to delete user: $error"));
     }
 
-    Future<void> updateStatus(String s) {
+    Future<void> updateStatus(String s,DocumentSnapshot m) {
+  print(m);
       return timed
           .doc(widget.id)
           .update({'satus': s})
           .then((value){
-        if(s=='completed'){
+        if(s=='completed' && m['satus']!='completed'){
+
+          print(widget.id);
 
           timed.doc(widget.id).get().then((doc){
             tutors.where('name',isEqualTo: doc['tutor']).get().then((value) {
               tutors.doc(value.docs[0].id).update({
                 'dues': value.docs[0]['dues'] + doc['tutor_fee'],
+              }).then((b) async {
+                  print(m.data());
+                  print("sabbbbb bdhiyaaa hai bosssss");
+                  String studentId = await getStudentId(doc['student']);
+                  dues.add({
+
+                    
+          'tutor': m['tutor'],
+          'tutorId': value.docs[0].id,
+          'due_date': m['due_date'],
+          'tutor_fee': m['tutor_fee'],
+          'assg_id': widget.id,
+          'status': "pending",
+          'ass_type': "timed",
+          'studentId' : studentId,
+          'subject' : m['subject']
+        }).then((value) => print("dues adddddddddddeddddd" + studentId));
+
               });
+              
+
             });
           });
         }
 
-      })
+      }
+      
+      )
           .catchError((error) => print("Failed to update user: $error"));
 
     }
@@ -324,7 +353,7 @@ class _TimedViewState extends State<TimedView> {
                           children: [
                             FlatButton(
                               onPressed: () {
-                                updateStatus('completed').whenComplete(() => Navigator.of(context).pop());
+                                updateStatus('completed',snapshot.data).whenComplete(() => Navigator.of(context).pop());
 
                               },
                               child: Container(
@@ -342,7 +371,7 @@ class _TimedViewState extends State<TimedView> {
                             ),
                             FlatButton(
                               onPressed: () {
-                                updateStatus('incomplete').whenComplete(() => Navigator.of(context).pop());
+                                updateStatus('incomplete',snapshot.data).whenComplete(() => Navigator.of(context).pop());
                                 //deleteAssignment() ;
                               },
                               child: Container(

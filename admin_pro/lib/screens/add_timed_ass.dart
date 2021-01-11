@@ -33,7 +33,7 @@ class _AddTimedState extends State<AddTimed> {
 
     CollectionReference payments =
         FirebaseFirestore.instance.collection('payment_collection');
-
+    
     firebase_storage.FirebaseStorage storage =
         firebase_storage.FirebaseStorage.instance;
 
@@ -154,7 +154,7 @@ class _AddTimedState extends State<AddTimed> {
         'comments': m['comments'],
         'satus': 'ongoing',
         'payment_pending': true,
-        'time_zone': m['time_zone']
+        
       }).then((value) {
         print("Assignment Added");
         print(m);
@@ -174,15 +174,15 @@ class _AddTimedState extends State<AddTimed> {
           print("dues not updated");
         });
 
-        dues.add({
-          'tutor': m['tutor'],
-          'tutorId': _tutorid,
-          'due_date': Timestamp.fromDate(m['start_date']),
-          'tutor_fee': m['tutor_fee'],
-          'assg_id': value.id,
-          'status': "pending",
-          'ass_type': "timed"
-        }).then((value) => null);
+        // dues.add({
+        //   'tutor': m['tutor'],
+        //   'tutorId': _tutorid,
+        //   'due_date': Timestamp.fromDate(m['start_date']),
+        //   'tutor_fee': m['tutor_fee'],
+        //   'assg_id': value.id,
+        //   'status': "pending",
+        //   'ass_type': "timed"
+        // }).then((value) => null);
 
         payments.add({
           'student': m['student_name'],
@@ -321,17 +321,7 @@ class _AddTimedState extends State<AddTimed> {
                                       .toList(),
                                 );
                               }),
-                          SizedBox(
-                            height: 15.0,
-                          ),
-                          FormBuilderTextField(
-                            attribute: "time_zone",
-                            maxLines: 1,
-                            decoration: getTextDecoration(label:"Time Zone",prefix:"UTC +  "),
-                            validators: [
-                            ],
-                            
-                          ),
+                         
                           SizedBox(
                             height: 15.0,
                           ),

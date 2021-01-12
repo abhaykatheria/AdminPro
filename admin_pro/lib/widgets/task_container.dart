@@ -106,7 +106,7 @@ class TaskContainer extends StatelessWidget {
                 Text("Tutor : "+tutor),
                 Padding(child:
                 Text(
-                  'Tutor Fee: '+ '$tutorFee \$',
+                  'Tutor Fee: '+ '$tutorFee INR',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 12.0

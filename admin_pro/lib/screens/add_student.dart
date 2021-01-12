@@ -3,8 +3,9 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:admin_pro/theme/decorations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_pro/widgets/constrained_container.dart';
+import 'package:admin_pro/screens/time_zones.dart';
 
-
+List<String> time_zone_list = time_zones.keys.toList();
 class AddStudent extends StatefulWidget {
   @override
   _AddStudentState createState() => _AddStudentState();
@@ -74,11 +75,41 @@ class _AddStudentState extends State<AddStudent> {
                           SizedBox(
                             height: 15.0,
                           ),
-                          FormBuilderTextField(
-                              attribute: "time_zone",
-                              maxLines: 1,
-                              decoration: getTextDecoration(label:"Time Zone",prefix: "UTC + "),
-                            ),
+                          // FormBuilderTextField(
+                          //     attribute: "time_zone",
+                          //     maxLines: 1,
+                          //     decoration: getTextDecoration(label:"Time Zone",prefix: "UTC + "),
+                          //   ),
+                          FormBuilderTypeAhead(
+                                  decoration: getTextDecoration(
+                                      label: "Time Zone", prefix: ""),
+                                  attribute: 'time_zone',
+                                  onChanged: _onChanged,
+                                  itemBuilder: (context, tutor) {
+                                    return ListTile(
+                                      title: Text(tutor),
+                                    );
+                                  },
+                                  controller: TextEditingController(text: ''),
+                                  suggestionsCallback: (query) {
+                                    if (query.isNotEmpty) {
+                                      var lowercaseQuery = query.toLowerCase();
+                                      return time_zone_list.where((tutor) {
+                                        return tutor
+                                            .toLowerCase()
+                                            .contains(lowercaseQuery);
+                                      }).toList(growable: false)
+                                        ..sort((a, b) => a
+                                            .toLowerCase()
+                                            .indexOf(lowercaseQuery)
+                                            .compareTo(b
+                                                .toLowerCase()
+                                                .indexOf(lowercaseQuery)));
+                                    } else {
+                                      return time_zone_list;
+                                    }
+                                  },
+                                ),
                             SizedBox(
                             height: 15.0,
                           ),

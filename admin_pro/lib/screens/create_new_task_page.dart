@@ -10,6 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'time_zones.dart';
 
 final String username = 'abhay.katheria1998@gmail.com';
 final String password = 'Kanpur@123';
@@ -67,7 +68,10 @@ class _CreateNewTaskState extends State<CreateNewTask> {
       QuerySnapshot q = await students.where("name", isEqualTo: name).get();
       return q.docs[0].id;
     }
-
+    Future<String> getStudentTimeZone(String name) async {
+      QuerySnapshot q = await students.where("name", isEqualTo: name).get();
+      return q.docs[0]['time_zone'];
+    }
     Future<List<String>> listExample(String sid) async {
       List<String> ls = List<String>();
 
@@ -95,15 +99,18 @@ class _CreateNewTaskState extends State<CreateNewTask> {
 
       return ls;
     }
-    String formatDate(Timestamp t){
+    String formatDate(Timestamp t, double offset){
       DateTime d = t.toDate();
+      Duration o = Duration(minutes: (offset*60).round());
+      d = d.add(o);
       String formattedDate =
           "${d.day}/${d.month}/${d.year}";
       return formattedDate;
     }
+    
     String getBodyString(List ld,Map<String, dynamic> m) {
       String heading =
-          "You have received a new assignment for \n student: ${m['student_name']} \n subject: ${m['subject']} \n The due date is ${formatDate(Timestamp.fromDate(m['due_date']))} \n and the files can be find in the links below \n\n";
+          "You have received a new assignment for \n student: ${m['student_name']} \n subject: ${m['subject']} \n The due date is ${formatDate(Timestamp.fromDate(m['due_date']),time_zones[m['time_zone']])} \n and the files can be find in the links below \n\n";
 
       String d = "";
       try {

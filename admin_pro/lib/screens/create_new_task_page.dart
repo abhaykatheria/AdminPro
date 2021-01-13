@@ -101,8 +101,14 @@ class _CreateNewTaskState extends State<CreateNewTask> {
     }
     String formatDate(Timestamp t, double offset){
       DateTime d = t.toDate();
-      Duration o = Duration(minutes: (offset*60).round());
-      d = d.add(o);
+      if(offset<0)
+        {offset = offset*(-1);
+        Duration o = Duration(minutes: (offset*60).round());
+        d = d.subtract(o);}
+      else{
+        Duration o = Duration(minutes: (offset*60).round());
+        d = d.add(o);
+      }
       String formattedDate =
           "${d.day}/${d.month}/${d.year}";
       return formattedDate;

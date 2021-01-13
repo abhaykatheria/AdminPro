@@ -255,7 +255,7 @@ class StudentsContainer extends StatelessWidget {
                 Padding(child: Text("Dues : " + dues.toString()+" \$",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 15.0
+                    fontSize: 10.0
                   ),
                 ),
                 padding:EdgeInsets.only(top: 10.0),),

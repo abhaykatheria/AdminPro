@@ -99,24 +99,10 @@ class _CreateNewTaskState extends State<CreateNewTask> {
 
       return ls;
     }
-    String formatDate(Timestamp t, double offset){
-      DateTime d = t.toDate();
-      if(offset<0)
-        {offset = offset*(-1);
-        Duration o = Duration(minutes: (offset*60).round());
-        d = d.subtract(o);}
-      else{
-        Duration o = Duration(minutes: (offset*60).round());
-        d = d.add(o);
-      }
-      String formattedDate =
-          "${d.day}/${d.month}/${d.year}";
-      return formattedDate;
-    }
-    
-    String getBodyString(List ld,Map<String, dynamic> m) {
+
+    String getBodyString(List ld,Map<String, dynamic> m,String timeZone) {
       String heading =
-          "You have received a new assignment for \n student: ${m['student_name']} \n subject: ${m['subject']} \n The due date is ${formatDate(Timestamp.fromDate(m['due_date']),time_zones[m['time_zone']])} \n and the files can be find in the links below \n\n";
+          "You have received a new assignment for \n student: ${m['student_name']} \n subject: ${m['subject']} \n The due date is ${formatDate(Timestamp.fromDate(m['due_date']),time_zones[timeZone])} \n and the files can be find in the links below \n\n";
 
       String d = "";
       try {
@@ -263,9 +249,12 @@ class _CreateNewTaskState extends State<CreateNewTask> {
                         child: Text('Send mail to tutor'),
                         onPressed: () {
                           listExample(ass_id).then((value) async {
-                            String body = getBodyString(value,m);
+                            String TZ =await getStudentTimeZone(m['student_name']);
+
+                            String body = getBodyString(value,m,TZ);
 
                             print(body);
+
                             String name = await getEmail(m['tutor']);
                             //print('gg ${m['tutor']}');
                             final Email email = Email(

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:admin_pro/screens/time_zones.dart';
 import 'package:flutter_duration_picker/flutter_duration_picker.dart';
 import 'package:random_string/random_string.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +59,10 @@ class _AddTimedState extends State<AddTimed> {
         // e.g, e.code == 'canceled'
       }
     }
+    Future<String> getStudentTimeZone(String name) async {
+      QuerySnapshot q = await students.where("name", isEqualTo: name).get();
+      return q.docs[0]['time_zone'];
+    }
 
     Future<String> getEmail(String name) async {
       QuerySnapshot q = await tutors.where("name", isEqualTo: name).get();
@@ -91,16 +96,10 @@ class _AddTimedState extends State<AddTimed> {
 
       return ls;
     }
-    String formatDate(Timestamp t){
-      DateTime d = t.toDate();
-      String formattedDate =
-          "${d.day}/${d.month}/${d.year}";
-      return formattedDate;
-    }
 
-    String getBodyString(List ld, Map<String, dynamic> m) {
+    String getBodyString(List ld, Map<String, dynamic> m,String timeZone) {
       String heading =
-          "You have received a new assignment for \n student: ${m['student_name']} \n subject: ${m['subject']} \n The due date is ${formatDate(Timestamp.fromDate(m['start_date']))} \n and the files can be find in the links below \n\n";
+          "You have received a new assignment for \n student: ${m['student_name']} \n subject: ${m['subject']} \n The start date is ${formatDate(Timestamp.fromDate(m['start_date']),time_zones[timeZone])} \n and the files can be find in the links below \n\n";
       String d = "";
       try {
         ld.forEach((element) {
@@ -229,7 +228,9 @@ class _AddTimedState extends State<AddTimed> {
                       child: Text('Send mail to tutor'),
                       onPressed: () {
                         listExample(ass_id).then((value) async {
-                          String body = getBodyString(value, m);
+                          String TZ =await getStudentTimeZone(m['student_name']);
+
+                          String body = getBodyString(value, m,TZ);
 
                           print(body);
                           String name = await getEmail(m['tutor']);

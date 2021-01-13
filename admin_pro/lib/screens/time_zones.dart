@@ -1,3 +1,25 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+
+
+
+String formatDate(Timestamp t, double offset){
+        DateTime d = t.toDate();
+        print("ggyo"+offset.toString());
+        if(offset<0)
+        {offset = offset*(-1);
+        Duration o = Duration(minutes: (offset*60).round());
+        d = d.subtract(o);}
+        else{
+                Duration o = Duration(minutes: (offset*60).round());
+                d = d.add(o);
+        }
+        String formattedDate = d.toString();
+        return formattedDate;
+}
+
+
 Map<String, double> time_zones = {
         'Pacific/ Honolulu': -10,
         'America/Juneau': -9,

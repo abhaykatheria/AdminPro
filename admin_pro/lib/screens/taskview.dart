@@ -1,6 +1,6 @@
 import 'package:admin_pro/screens/edit_taskview.dart';
+import 'package:admin_pro/screens/time_zones.dart';
 import 'package:flutter/material.dart';
-import 'package:admin_pro/widgets/data.dart';
 import 'package:admin_pro/theme/colors/light_colors.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -46,15 +46,10 @@ CollectionReference students =
       return q.docs[0]['email'];
     }
 
-
-    String formatDate(Timestamp t){
-      DateTime d = t.toDate();
-       String formattedDate =
-        "${d.day}/${d.month}/${d.year}";
-        return formattedDate;
+    Future<String> getStudentTimeZone(String name) async {
+      QuerySnapshot q = await students.where("name", isEqualTo: name).get();
+      return q.docs[0]['time_zone'];
     }
-
-
   Future<void> deleteAssignment() {
   return assignments
     .doc(widget.id)
@@ -138,10 +133,16 @@ Future<void> updateStatus(String s,DocumentSnapshot m) {
 
       return ls;
     }
+    String formatDate2(Timestamp t){
+      DateTime d = t.toDate();
+      String formattedDate =
+          "${d.day}/${d.month}/${d.year}";
+      return formattedDate;
+    }
 
-    String getBodyString(List ld,Map<String, dynamic> m){
+    String getBodyString(List ld,Map<String, dynamic> m,String timeZone){
       String heading =
-          "You have received a new assignment for \n student: ${m['student']} \n subject: ${m['subject']} \n The due date is ${formatDate(m['due_date'])} \n and the files can be find in the links below \n\n";
+          "You have received a new assignment for \n student: ${m['student']} \n subject: ${m['subject']} \n The due date is ${formatDate(m['due_date'],time_zones[timeZone])} \n and the files can be find in the links below \n\n";
 
       String d="";
       try{
@@ -277,12 +278,12 @@ Future<void> updateDate(BuildContext context) async {
                                   ),
                                   taskviewfield(
                                       field: "Assigned Date",
-                                      value: formatDate(data['assigned_date']),),
+                                      value: formatDate2(data['assigned_date']),),
                                   SizedBox(
                                     height: 12.0,
                                   ),
                                   taskviewfield(
-                                      field: "Due Date", value: formatDate(data['due_date'])),
+                                      field: "Due Date", value: formatDate2(data['due_date'])),
                                   SizedBox(height: 25.0),
                                   taskviewfield(
                                       field: "Status", value: data['satus']),
@@ -322,7 +323,8 @@ Future<void> updateDate(BuildContext context) async {
                             print(body);
                             */
                             listExample(data['ass_id']).then((value)async {
-                              String body = getBodyString(value,data);
+                              String TZ =await getStudentTimeZone(data['student_name']);
+                              String body = getBodyString(value,data,TZ);
 
                               print(body);
                               String name = await getEmail(

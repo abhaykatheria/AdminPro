@@ -238,29 +238,7 @@ class _FinancialState extends State<Financial> {
                         ),
                       );
                     }),
-                StreamBuilder(
-                    stream: dues.snapshots(),
-                    builder: (context, snapshot) {
-                      int pendingAmount = 0;
-                      int pendingNo = 0;
-                      if (!snapshot.hasData) return Text("Loading.......");
-                      for (DocumentSnapshot doc in snapshot.data.documents) {
-                        if (doc['status'] == 'pending') {
-                          pendingAmount += doc['tutor_fee'];
-                          pendingNo++;
-                        }
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ActiveProjectsCard(
-                          title: "payments pending",
-                          subtitle: "to ${pendingNo} tutors",
-                          amount: pendingAmount,
-                          cardColor: Colors.teal,
-                          extend: "\$",
-                        ),
-                      );
-                    })
+                
               ],
             ),
             Padding(

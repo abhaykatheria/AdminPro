@@ -191,7 +191,8 @@ class _AddTimedState extends State<AddTimed> {
           'due_date': Timestamp.fromDate(m['start_date']),
           'status': "pending",
           'pending': m['price'] - m['amount_paid'],
-          'assg_id': value.id
+          'assg_id': timed_id,
+          'subject' :m['subject']
         }).then((value) => showDialog(
               context: context,
               builder: (_) => AlertDialog(

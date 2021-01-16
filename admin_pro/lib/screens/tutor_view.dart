@@ -130,7 +130,7 @@ Widget _buildListItem(
                               //   height: 12.0,
                               // )
                               taskviewfield(
-                                  field: "Dues ", value: data['dues'].toString() + " \$"),
+                                  field: "Dues ", value: data['dues'].toString() + " INR"),
                               SizedBox(
                                 height: 12.0,
                               ),

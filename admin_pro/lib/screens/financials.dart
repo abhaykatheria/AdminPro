@@ -69,10 +69,12 @@ class _FinancialState extends State<Financial> {
         },
         child: ListTile(
           title:
-              Text(doc['student'] + "   " + "\$ " + doc['pending'].toString()),
-          subtitle: Row(
+              Text("Student - " + doc['student']+"    Price - " + doc['pending'].toString() + "  \$"),
+          subtitle: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text("Subject : " + doc['subject'] ),
             Text("Due date: $s"),
             Text(
                 "Status: ${doc['status']}"

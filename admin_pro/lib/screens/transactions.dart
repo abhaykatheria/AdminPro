@@ -28,46 +28,31 @@ class _transactionsState extends State<transactions> {
       DateTime d = doc['due_date'].toDate();
       String s = "${d.day}-${d.month}-${d.year}";
       
-      return FlatButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-              title: Text("Change Payment status"),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[
-                    Text('You are about to change the status to collected'),
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('Mark Collected'),
-                  onPressed: () {
-                    payments
-                        .doc(doc.id)
-                        .update({'status': 'collected'})
-                        .then((value) => print("updated"))
-                        .catchError((err) => print(err));
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ),
+      return FutureBuilder(
+        future: assgs.where('ass_id',isEqualTo: doc['assg_id']).get(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (!snapshot.hasData) return Text("Loading.......");
+          print(doc['assg_id']);
+          
+          int ass_price = snapshot.data.docs[0]['price'];
+          String subject = snapshot.data.docs[0]['subject'];
+          return FlatButton(
+            child: ListTile(
+          title:
+              Text("Student - " + doc['student']+"    Price - " + doc['pending'].toString() + "  \$"),
+          subtitle: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Subject : " + doc['subject'] ),
+            Text("Due date: $s"),
+            Text(
+                "Status: ${doc['status']}"
+            )
+          ]),
+        ),
           );
         },
-        child: ListTile(
-          title:
-              Text(doc['student'] + "   " + "\$ " + doc['pending'].toString()),
-          subtitle: Text(s),
-        ),
       );
     }
 
@@ -96,8 +81,10 @@ class _transactionsState extends State<transactions> {
                   onPressed: () {
                     dues
                         .doc(doc.id)
-                        .update({'status': 'transferred'})
-                        .then((value) => print("updated"))
+                        .update({'status': 'completed'})
+                        .then((value) {
+                          
+                        })
                         .catchError((err) => print(err));
                     Navigator.of(context).pop();
                   },
@@ -114,8 +101,16 @@ class _transactionsState extends State<transactions> {
         },
         child: ListTile(
           title:
-              Text(doc['tutor'] + "   " + "\$ " + doc['tutor_fee'].toString()),
-          subtitle: Text(s),
+              Text("Tutor - "+doc['tutor'] + "    Fee - "+ doc['tutor_fee'].toString() + "  INR" ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Subject : " + doc['subject'] ),
+              Text("Due Date -"+s),
+              
+
+            ],
+          ),
         ),
       );
     }
@@ -128,18 +123,45 @@ class _transactionsState extends State<transactions> {
 
       
       
-      return StreamBuilder<DocumentSnapshot>(
-        stream: assgs.doc(doc['assg_id']).snapshots(),
-        builder: (context, snapshot) {
-          int ass_price = snapshot.data.data()['price'];
+      // return StreamBuilder<DocumentSnapshot>(
+      //   stream: assgs.doc(doc['assg_id']).get(),
+      //   builder: (context, snapshot) {
+      //     if (!snapshot.hasData) return Text("Loading.......");
+      //     int ass_price = snapshot.data.data()['price'];
+      //     return FlatButton(
+      //       child: ListTile(
+      //         title:
+      //             Text(doc['student'] + "   " + "\$ " + ass_price.toString()),
+      //         subtitle: Text(s),
+      //       ),
+      //     );
+      //   }
+      // );
+      return FutureBuilder(
+        future: assgs.where('ass_id',isEqualTo: doc['assg_id']).get(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (!snapshot.hasData) return Text("Loading.......");
+          print(doc['assg_id']);
+          
+          int ass_price = snapshot.data.docs[0]['price'];
+          String subject = snapshot.data.docs[0]['subject'];
           return FlatButton(
             child: ListTile(
-              title:
-                  Text(doc['student'] + "   " + "\$ " + ass_price.toString()),
-              subtitle: Text(s),
-            ),
+          title:
+              Text("Student - " + doc['student']+"    Price - " + doc['pending'].toString() + "  \$"),
+          subtitle: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Subject : " + doc['subject'] ),
+            Text("Due date: $s"),
+            Text(
+                "Status: ${doc['status']}"
+            )
+          ]),
+        ),
           );
-        }
+        },
       );
     }
 
@@ -155,8 +177,16 @@ Widget _buildListItem3(
         },
         child: ListTile(
           title:
-              Text(doc['tutor'] + "   " + "\$ " + doc['tutor_fee'].toString()),
-          subtitle: Text(s),
+              Text("Tutor - "+doc['tutor'] + "    Fee - "+ doc['tutor_fee'].toString() + "  INR" ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Subject : " + doc['subject'] ),
+              Text("Due Date -"+s),
+              
+
+            ],
+          ),
         ),
       );
     }
@@ -281,7 +311,7 @@ Widget _buildListItem3(
                 style: GoogleFonts.play(textStyle: TextStyle(fontSize: 25.0)),
               ),
               expanded: StreamBuilder(
-                            stream: dues.where('status',isEqualTo: 'transferred').snapshots(),
+                            stream: dues.where('status',isEqualTo: 'completed').snapshots(),
                             builder:
                                 (BuildContext context, AsyncSnapshot snapshot) {
                               if (!snapshot.hasData)

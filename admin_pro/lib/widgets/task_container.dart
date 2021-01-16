@@ -180,7 +180,7 @@ class TutorContainer extends StatelessWidget {
             ),
             Column(
               children: [
-                Padding(child: Text("Dues : " + dues.toString()+" \$",
+                Padding(child: Text("Dues : " + dues.toString()+" INR",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15.0
@@ -251,11 +251,14 @@ class StudentsContainer extends StatelessWidget {
 
             Column(
               children: [
-                Text("Time Zone : "+time_zone),
+                Text("Time Zone : "+ time_zone ,
+                style: TextStyle(
+                  fontSize: 10.0
+                ),),
                 Padding(child: Text("Dues : " + dues.toString()+" \$",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 10.0
+                    fontSize: 12.0
                   ),
                 ),
                 padding:EdgeInsets.only(top: 10.0),),

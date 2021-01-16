@@ -184,7 +184,7 @@ class _CreateNewTaskState extends State<CreateNewTask> {
         print("Assignment Added");
         print(m);
 
-        String ass_id = value.id;
+        // String ass_id = value.id;
         // _fbKey.currentState.reset();
 
         tutors
@@ -210,8 +210,9 @@ class _CreateNewTaskState extends State<CreateNewTask> {
           'due_date': Timestamp.fromDate(m['due_date']),
           'status': "pending",
           'pending': m['price'] - m['amount_paid'],
-          'assg_id': value.id,
-          'ass_type': "general"
+          'assg_id': ass_id,
+          'ass_type': "general",
+          'subject' : m['subject']
         }).then((value) => showDialog(
             context: context,
             builder: (_) => AlertDialog(
